@@ -1,5 +1,5 @@
 # Win
 
 # Features
-Move mouse and do clicks\n
+Move mouse and do clicks
 Take screenshots and compare with .bmp pictures
