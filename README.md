@@ -1,2 +1,5 @@
-# win
-Control mouse and take screenshot
+# Win
+
+# Features
+Move mouse and do clicks
+Take screenshots and compare with .bmp pictures
