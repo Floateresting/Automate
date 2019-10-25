@@ -1,11 +1,11 @@
 # Automate
 Automate stuff with Automate.dll
 
-# Automate.Mouse
+## Automate.Mouse
 Move cursor, perform clicks and get current cursor position
 
-# Automate.Window
+## Automate.Window
 Take screenshot, save screenshot and find a .bmp image on screen
 
-# Automate.application
+## Automate.application
 Resize an application's window, set focus
