@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace Automate {
-    class Application {
+    public class Application {
         // Issue with the "Bounds"
         public double ratio = (double)Screen.PrimaryScreen.Bounds.Width / 1920;
 

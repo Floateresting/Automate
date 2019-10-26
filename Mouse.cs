@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 
 namespace Automate {
-    class Mouse {
+    public class Mouse {
         // Issue with the "Bounds"
         public double ratio = (double)Screen.PrimaryScreen.Bounds.Width / 1920;
 
@@ -37,9 +37,10 @@ namespace Automate {
         /// <summary>
         /// Move cursor to a position
         /// </summary>
-        /// <param name="point">Point(x, y)</param>
-        public void MoveTo(Point point) {
-            SetCursorPos((int)(point.X * ratio), (int)(point.Y * ratio));
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public void MoveTo(int x, int y) {
+            SetCursorPos((int)(x * ratio), (int)(y * ratio));
         }
 
         /// <summary>
@@ -47,8 +48,8 @@ namespace Automate {
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        public void MoveTo(int x, int y) {
-            SetCursorPos((int)(x * ratio), (int)(y * ratio));
+        public void MoveTo((int, int) pos) {
+            SetCursorPos((int)(pos.Item1 * ratio), (int)(pos.Item2 * ratio));
         }
 
         /// <summary>

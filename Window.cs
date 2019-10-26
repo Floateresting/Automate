@@ -7,7 +7,7 @@ using System.Windows.Forms;
 namespace Automate {
     public class Window {
         // Issue with the "Bounds"
-        public double ratio = (double)Screen.PrimaryScreen.Bounds.Width / 1920;
+        //public double ratio = (double)Screen.PrimaryScreen.Bounds.Width / 1920;
 
         public int offsetX, offsetY, offsetW, offsetH;
 
@@ -31,7 +31,9 @@ namespace Automate {
         /// <param name="template">Bmp image to search</param>
         /// <param name="tolerance"></param>
         /// <returns>Center of the image on screen</returns>
-        public (int, int) LocateOnScreen(Bitmap template, int tolerance) {
+        public (int, int) LocateOnScreen(string templatePath, int tolerance) {
+            Bitmap template = new Bitmap(templatePath);
+
             // tolerance^2 = deltaR^2 + deltaG^2 + deltaB^2
             int toleranceSquared = tolerance * tolerance;
 
@@ -128,7 +130,7 @@ namespace Automate {
         /// <summary>
         /// Save screenshot to 'screenshot.bmp'
         /// </summary>
-        public void Save() {
+        public void SaveScreenshot() {
             Size screenshotSize = new Size(offsetW, offsetH);
             Bitmap screenshot = new Bitmap(offsetW, offsetH, PixelFormat.Format32bppRgb);
 
