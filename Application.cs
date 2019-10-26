@@ -3,14 +3,16 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace Kyuidime {
+namespace Automate {
     class Application {
-        // issue with the "Bounds"
+        // Issue with the "Bounds"
         public double ratio = (double)Screen.PrimaryScreen.Bounds.Width / 1920;
 
+        // Set focus to this app
         [DllImport("user32", SetLastError = true)]
         static extern void SwitchToThisWindow(IntPtr hwnd, bool turnOn);
 
+        // Change positon and size
         [DllImport("user32", SetLastError = true)]
         static extern bool MoveWindow(IntPtr hwnd, int x, int y, int w, int h, bool repaint);
 

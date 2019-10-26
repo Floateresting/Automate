@@ -1,0 +1,5 @@
+E:\Git\Automate\obj\Debug\Automate.csprojAssemblyReference.cache
+E:\Git\Automate\bin\Debug\Automate.dll
+E:\Git\Automate\bin\Debug\Automate.pdb
+E:\Git\Automate\obj\Debug\Automate.dll
+E:\Git\Automate\obj\Debug\Automate.pdb
