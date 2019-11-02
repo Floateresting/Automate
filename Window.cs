@@ -219,7 +219,7 @@ namespace Automate {
                                 match = false;
                         }
                         if(match) {
-                            Console.WriteLine(message + (tolerance1 + tolerance2) / 2);
+                            Console.WriteLine(message + Math.Sqrt((tolerance1 + tolerance2) / 2));
                             // return the middle point
                             return (x1 + offsetX + template.Width / 2, y1 + offsetY + template.Height / 2);
                         }
