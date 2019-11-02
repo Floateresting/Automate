@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Threading;
-using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
-
+using System.Windows;
 
 namespace Automate {
     public class Mouse {
@@ -43,13 +42,17 @@ namespace Automate {
             SetCursorPos((int)(x * ratio), (int)(y * ratio));
         }
 
+        public void MoveTo(double x, double y) {
+            SetCursorPos((int)(x * ratio), (int)(y * ratio));
+        }
+
         /// <summary>
         /// Move cursor to a position
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        public void MoveTo((int, int) pos) {
-            SetCursorPos((int)(pos.Item1 * ratio), (int)(pos.Item2 * ratio));
+        public void MoveTo(Point point) {
+            SetCursorPos((int)(point.X* ratio), (int)(point.Y* ratio));
         }
 
         /// <summary>
@@ -57,6 +60,22 @@ namespace Automate {
         /// </summary>
         public void Click() {
             mouse_event(MOUSE_LEFT_DOWN | MOUSE_LEFT_UP, 0, 0, 0, 0);
+        }
+
+        public void ClickAt(int x, int y) {
+            MoveTo(x,y);
+            Click();
+        }
+
+        public void ClickAt(double x, double y) {
+            MoveTo(x, y);
+            Click();
+        }
+
+
+        public void ClickAt(Point point) {
+            MoveTo(point);
+            Click();
         }
 
         /* Drag the cursor (under construction!)
@@ -91,10 +110,10 @@ namespace Automate {
         /// Get current cursor position
         /// </summary>
         /// <returns>(x, y)</returns>
-        public (int, int) GetMousePosition() {
+        public Point GetMousePosition() {
             MousePoint mousePoint = new MousePoint();
             GetCursorPos(ref mousePoint);
-            return ((int)(mousePoint.X / ratio), (int)(mousePoint.Y / ratio));
+            return new Point((int)(mousePoint.X / ratio), (int)(mousePoint.Y / ratio));
         }
     }
 }
