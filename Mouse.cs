@@ -78,33 +78,40 @@ namespace Automate {
             Click();
         }
 
-        /* Drag the cursor (under construction!)
-        public void Drag(char axis, Point center, int pixels) {
-            void MoveAtX(Point start) {
-                // go from -1 to -100 || from 1 to 100, should work I guess?
-                for(int i = pixels / Math.Abs(pixels); Math.Abs(i) <= Math.Abs(pixels); i += pixels / Math.Abs(pixels)) {
-                    MoveTo(new Point(start.X+i, start.Y));
-                    Thread.Sleep(5);
-                }
-            }
-            
-            //void MoveAtY(Point start) {
-            //    // go from -1 to -100 || from 1 to 100, should work I guess? ( I...I didn't copy/paste or anything!! )
-            //    for(int i = pixels / Math.Abs(pixels); Math.Abs(i) <= Math.Abs(pixels); i += pixels / Math.Abs(pixels)) {
-            //        MoveTo(new Point(start.X, start.Y+i));
-            //    }
-            //}
-
-            Point startpoint;
-            if(axis=='x') {
-                startpoint = new Point(center.X - pixels / 2, center.Y);
-                MoveTo(startpoint);
-                mouse_event(MOUSE_LEFT_DOWN, 0, 0, 0, 0);
-                MoveAtX(startpoint);
+        /// <summary>
+        /// Drag the mouse at the x axis
+        /// </summary>
+        /// <param name="from">Starting point</param>
+        /// <param name="px"></param>
+        /// <param name="pxPerSec">Maximum 5</param>
+        public void DragH(Point from, int px, int pxPerSec) {
+            MoveTo(from);
+            mouse_event(MOUSE_LEFT_DOWN, 0, 0, 0, 0);
+            for(int i = 1; i <= Math.Abs(px); i += pxPerSec) {
+                // if px is negative, move to left, else to right
+                MoveTo(from.X + (px > 0 ? i : -i), from.Y);
+                Thread.Sleep(1);
             }
             mouse_event(MOUSE_LEFT_UP, 0, 0, 0, 0);
         }
-        */
+
+        /// <summary>
+        /// Drag the mouse at the y axis
+        /// </summary>
+        /// <param name="from">Starting point</param>
+        /// <param name="px"></param>
+        /// <param name="pxPerSec">Maximum 5</param>
+        public void DragV(Point from, int px, int pxPerSec) {
+            MoveTo(from);
+            mouse_event(MOUSE_LEFT_DOWN, 0, 0, 0, 0);
+            for(int i = 1; i <= Math.Abs(px); i += pxPerSec) {
+                // if px is negative, move to left, else to right
+                MoveTo(from.X, from.Y + (px > 0 ? i : -i));
+                Thread.Sleep(1);
+            }
+            mouse_event(MOUSE_LEFT_UP, 0, 0, 0, 0);
+        }
+
 
         /// <summary>
         /// Get current cursor position

@@ -6,9 +6,6 @@ using System.IO;
 
 namespace Automate {
     public class Window {
-        // Issue with the "Bounds"
-        //public double ratio = (double)Screen.PrimaryScreen.Bounds.Width / 1920;
-
         public int offsetX, offsetY, offsetW, offsetH;
 
         /// <summary>
@@ -85,8 +82,9 @@ namespace Automate {
         /// </summary>
         /// <param name="template">Bmp image to search</param>
         /// <param name="tolerance"></param>
+        /// <param name="minDistance">Minimum distance between each found template in px</param>
         /// <returns>Center of the image on screen</returns>
-        public List<System.Windows.Point> LocateAllOnScreen(string templatePath, int tolerance) {
+        public List<System.Windows.Point> LocateAllOnScreen(string templatePath, int tolerance, int minDistance) {
             if(!File.Exists(templatePath)) {
                 throw new Exception($"Error: templatePath not valid, can't find '{templatePath}'");
             }
@@ -116,6 +114,23 @@ namespace Automate {
                 bool match = true;
                 // Search for each px on the line (screen)
                 for(int x1 = 0; x1 < screenshotArray[y1].Length - templateArray[0].Length; x1++) {
+                    bool skip = false;
+                    // foreach found points...
+                    foreach(System.Windows.Point foundPoint in locations) {
+                        // if current x1 is between the found template
+                        if(foundPoint.X - offsetX - (templateArray[0].Length+minDistance) / 2f <= x1 && x1 <= foundPoint.X - offsetX + (templateArray[0].Length+minDistance) / 2f) {
+                            // if current y1 is between the found template
+                            if(foundPoint.Y - offsetY - (templateArray.Length+minDistance) / 2f <= y1 && y1 <= foundPoint.Y - offsetY + (templateArray.Length+minDistance) / 2f) {
+                                // skip this location
+                                skip = true;
+                                break;
+                            }
+                        }
+                    }
+                    if(skip) {
+                        continue;
+                    }
+
                     // _: Tolerance on 1st line
                     //  match1: if the 1st line (screen) matches the 1st line (template)
                     (int _, bool match1) = SearchFor1Line(screenshotArray[y1], x1, templateArray[0], 0, toleranceSquared);
@@ -213,6 +228,12 @@ namespace Automate {
         }
 
         #region Methods for LocateOnScreen (Private)
+
+        /// <summary>
+        /// Convert a bmp image to rgb array
+        /// </summary>
+        /// <param name="bitmap"></param>
+        /// <returns></returns>
         private byte[][][] GetBitmapArray(Bitmap bitmap) {
             // byte[y][x][r, g, b]
             byte[][][] bitmapArray = new byte[bitmap.Height][][];
@@ -243,7 +264,15 @@ namespace Automate {
             return bitmapArray;
         }
 
-        // Check if all pixels match (only for 1 line)
+        /// <summary>
+        /// Check if all pixels match (only for 1 line)
+        /// </summary>
+        /// <param name="screenLine"></param>
+        /// <param name="screenStart"></param>
+        /// <param name="templateLine"></param>
+        /// <param name="templateStart"></param>
+        /// <param name="toleranceSquared"></param>
+        /// <returns></returns>
         private (int, bool) SearchFor1Line(byte[][] screenLine, int screenStart, byte[][] templateLine, int templateStart, int toleranceSquared) {
             int maxDelta = 0;
             for(int x = 0; x < templateLine.Length; x++) {
