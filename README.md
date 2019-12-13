@@ -18,28 +18,28 @@ using System.Drawing;
 using Automate;
 
 class Program {
-	private readonly static Mouse mouse = new Mouse();
+    private readonly static Mouse mouse = new Mouse();
 
-	static void Main(string[] args){
-		// Move to cursor to (500, 500)
-		mouse.MoveTo(new Point(500, 500));
-		mouse.MoveTo(500, 500);
+    static void Main(string[] args){
+        // Move to cursor to (500, 500)
+        mouse.MoveTo(new Point(500, 500));
+        mouse.MoveTo(500, 500);
 
-		// Left click at current cursor's position
-		mouse.Click();
+        // Left click at current cursor's position
+        mouse.Click();
 
-		// Left click at (400, 400)
-		mouse.ClickAt(400, 400);
-		mouse.ClickAt(new Point(400,400));
+        // Left click at (400, 400)
+        mouse.ClickAt(400, 400);
+        mouse.ClickAt(new Point(400,400));
 
-		// From (300, 300), move 200 pixels towards right at 2 pixel/ms
-		mouse.DragH(new Point(300, 300), 200, 2);
-		// From (200, 200), move 100 pixels upwards at 3 pixel/ms
-		mouse.DragV(new Point(200, 200), -100, 3);
+        // From (300, 300), move 200 pixels towards right at 2 pixel/ms
+        mouse.DragH(new Point(300, 300), 200, 2);
+        // From (200, 200), move 100 pixels upwards at 3 pixel/ms
+        mouse.DragV(new Point(200, 200), -100, 3);
 
-		// Get current cursor's position
-		Point cursorPos = mouse.GetMousePosition();
-	}
+        // Get current cursor's position
+        Point cursorPos = mouse.GetMousePosition();
+    }
 }
 
 ~~~
@@ -54,7 +54,7 @@ Features
 ##### Examples
 ~~~cs
 class Program {
-	// By default it will use the entire screen
+    // By default it will use the entire screen
     private readonly static Window window1 = new Window();
     // Only 1280x720 from the top-left corner
     private readonly static Window window2 = new Window(0, 0, 1280, 720);
@@ -62,7 +62,7 @@ class Program {
     private readonly static Window window3 = new Window(new Point(100, 100), new Size(1280, 720));
 
     static void Main(string[] args) {
-    	// Search for the exact image (no tolerance)
+        // Search for the exact image (no tolerance)
         bool sucess1 = window1.LocateOnScreen("template.bmp", out Point result1);
         // Search for the image with tolerance 30, from (500, 500) to (600, 600) of the screen
         bool sucess2 = window2.LocateOnScreen("template.bmp", out Point result2, 30, new Point(500, 500), new Size(100, 100));
@@ -90,12 +90,12 @@ Features
 ##### Examples
 ~~~cs
 class Program {
-	// Link to VisualStudio (VisualStudio's process name is 'devenv')
-	// process name's can be found in 'Task Manager -> Details'
+    // Link to VisualStudio (VisualStudio's process name is 'devenv')
+    // process name's can be found in 'Task Manager -> Details'
     private static readonly Application application = new Application("devenv");
 
     static void Main(string[] args) {
-    	// Bring the window to front (or set focus to this window)
+        // Bring the window to front (or set focus to this window)
         application.SetFocus();
         
         // Move the window to top-left corner and resize it to 1280x720
