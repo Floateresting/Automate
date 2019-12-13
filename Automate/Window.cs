@@ -103,7 +103,7 @@ namespace Automate {
         /// <param name="templatePath">Path to the template image</param>
         /// <param name="tolerance">Color difference between pixels, which is Sqrt(r^2 + g^2 + b^2)</param>
         /// <param name="result">First matched result, new <see cref="System.Drawing.Point()"/> if not found</param>
-        /// <param name="position">(Optimal) Position of left-corner of the screenshot</param>
+        /// <param name="position">(Optimal) Position of top-left corner of the screenshot</param>
         /// <param name="screenshotSize">Size of the screenshot</param>
         /// <returns>True if the image was found</returns>
         public bool LocateOnScreen(string templatePath, out Point result, int tolerance = 0, Point? position = null, Size? screenshotSize = null) {
@@ -173,7 +173,7 @@ namespace Automate {
         /// <param name="result">First matched result, new <see cref="System.Drawing.Point()"/> if not found</param>
         /// <param name="actualTolerance">Actual tolerance found</param>
         /// <param name="estimatedTolerence">Color difference between pixels, which is Sqrt(r^2 + g^2 + b^2)</param>
-        /// <param name="position">(Optimal) Position of left-corner of the screenshot</param>
+        /// <param name="position">(Optimal) Position of top-left corner of the screenshot</param>
         /// <param name="screenshotSize">Size of the screenshot</param>
         /// <returns>True if the image was found</returns>
         public bool LocateOnScreen(string templatePath, out Point result, out double actualTolerance, int estimatedTolerence = 0, Point? position = null, Size? screenshotSize = null) {
@@ -246,7 +246,7 @@ namespace Automate {
         /// <param name="minDistance">Minimum distance between each found template in px</param>
         /// <param name="tolerance">Color difference between pixels, which is Sqrt(r^2 + g^2 + b^2)</param>
         /// <param name="results">All matched results, new <see cref="System.Collections.Generic.List{T}()"/> if nothing found</param>
-        /// <param name="position">(Optimal) Position of left-corner of the screenshot</param>
+        /// <param name="position">(Optimal) Position of top-left corner of the screenshot</param>
         /// <param name="screenshotSize">Size of the screenshot</param>
         /// <returns></returns>
         public bool LocateAllOnScreen(string templatePath, int minDistance, out List<Point> results, int tolerance = 0, Point? position = null, Size? screenshotSize = null) {
@@ -348,10 +348,10 @@ namespace Automate {
                 position = this.position;
             }
 
-            if(!path.EndsWith(".bmp")) {
+            if(!path.EndsWith(".bmp"
+)) {
                 path += ".bmp";
             }
-
             Window.TakeScreenshot((Point)position, (Size)screenshotSize)
                 .Save(path, ImageFormat.Bmp);
         }
@@ -376,7 +376,7 @@ namespace Automate {
         /// <summary>
         /// Take screenshot from specified location
         /// </summary>
-        /// <param name="position">left-corner position of the screenshot</param>
+        /// <param name="position">top-left corner position of the screenshot</param>
         /// <param name="screenshotSize">size (or resolution) of the screenshot</param>
         /// <returns>Bitmap image of the screenshot</returns>
         private static Bitmap TakeScreenshot(Point position, Size screenshotSize) {

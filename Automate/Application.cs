@@ -37,7 +37,7 @@ namespace Automate {
         /// <summary>
         /// Set focus of this app
         /// </summary>
-        public void Switch() {
+        public void SetFocus() {
             SwitchToThisWindow(processHwnd, true);
         }
 
