@@ -7,7 +7,8 @@ namespace AutomateDemo {
         static void Main(string[] args) {
             while(true) {
                 Console.ReadLine();
-                Console.WriteLine(mouse.GetMousePosition()); 
+                mouse.MoveTo(1119, 585);
+                Console.WriteLine(mouse.GetMousePosition());
             }
         }
     }

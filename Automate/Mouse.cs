@@ -49,7 +49,7 @@ namespace Automate {
         /// <param name="x"></param>
         /// <param name="y"></param>
         public void MoveTo(int x, int y) {
-            SetCursorPos((int)(x * this.scaling), (int)(y * this.scaling));
+            SetCursorPos((int)(x / this.scaling), (int)(y / this.scaling));
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace Automate {
         /// <param name="x"></param>
         /// <param name="y"></param>
         public void MoveTo(Point point) {
-            SetCursorPos((int)(point.X * this.scaling), (int)(point.Y * this.scaling));
+            SetCursorPos((int)(point.X / this.scaling), (int)(point.Y / this.scaling));
         }
         #endregion
 
