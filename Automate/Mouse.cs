@@ -72,12 +72,12 @@ namespace Automate {
         }
 
         public void ClickAt(int x, int y) {
-            SetCursorPos((int)(x * this.scaling), (int)(y * this.scaling));
+            SetCursorPos((int)(x / this.scaling), (int)(y / this.scaling));
             mouse_event(MOUSE_LEFT_DOWN | MOUSE_LEFT_UP, 0, 0, 0, 0);
         }
 
         public void ClickAt(Point point) {
-            SetCursorPos((int)(point.X * this.scaling), (int)(point.Y * this.scaling));
+            SetCursorPos((int)(point.X / this.scaling), (int)(point.Y / this.scaling));
             mouse_event(MOUSE_LEFT_DOWN | MOUSE_LEFT_UP, 0, 0, 0, 0);
         }
         #endregion
