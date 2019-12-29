@@ -94,12 +94,12 @@ namespace Automate {
             // Maximum 5, else doesn't work
             pxPerSec = pxPerSec > 5 ? 5 : pxPerSec;
 
-            SetCursorPos((int)(from.X * this.scaling), (int)(from.Y * this.scaling));
+            SetCursorPos((int)(from.X / this.scaling), (int)(from.Y / this.scaling));
 
             mouse_event(MOUSE_LEFT_DOWN, 0, 0, 0, 0);
             for(int i = 1; i <= Math.Abs(px); i += pxPerSec) {
                 // if px is negative, move to left, else to right
-                SetCursorPos((int)((from.X + (px > 0 ? i : -i)) * this.scaling), (int)(from.Y * this.scaling));
+                SetCursorPos((int)((from.X + (px > 0 ? i : -i)) / this.scaling), (int)(from.Y / this.scaling));
                 Thread.Sleep(1);
             }
             mouse_event(MOUSE_LEFT_UP, 0, 0, 0, 0);
@@ -115,12 +115,12 @@ namespace Automate {
             // Maximum 5, else does't work
             pxPerSec = pxPerSec > 5 ? 5 : pxPerSec;
 
-            SetCursorPos((int)(from.X * this.scaling), (int)(from.Y * this.scaling));
+            SetCursorPos((int)(from.X / this.scaling),(int)(from.Y / this.scaling));
 
             mouse_event(MOUSE_LEFT_DOWN, 0, 0, 0, 0);
             for(int i = 1; i <= Math.Abs(px); i += pxPerSec) {
                 // if px is negative, move to left, else to right
-                SetCursorPos((int)(from.X * this.scaling), (int)((from.Y + (px > 0 ? i : -i)) * this.scaling));
+                SetCursorPos((int)(from.X / this.scaling), (int)((from.Y + (px > 0 ? i : -i))/ this.scaling));
                 Thread.Sleep(1);
             }
             mouse_event(MOUSE_LEFT_UP, 0, 0, 0, 0);
