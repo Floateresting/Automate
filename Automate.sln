@@ -5,7 +5,12 @@ VisualStudioVersion = 16.0.29519.87
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Automate", "Automate\Automate.csproj", "{A1A29CCD-7CD4-4BA0-999A-74C76E049926}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Automate.Demo", "Automate.Demo\Automate.Demo.csproj", "{B99E980C-0D2D-4BF7-A6AA-DF7BE9CC00D8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Automate.Demo", "Automate.Demo\Automate.Demo.csproj", "{B99E980C-0D2D-4BF7-A6AA-DF7BE9CC00D8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E7F0826C-07DB-43A2-A63C-8D24D977D01F}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
