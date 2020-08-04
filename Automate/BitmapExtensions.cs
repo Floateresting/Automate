@@ -1,43 +1,38 @@
 ﻿using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace Automate {
     public static class BitmapExtensions {
-        /// <summary>Check if all pixels match for 1 line</summary>
-        /// <param name="hl">Line on the heystack</param>
-        /// <param name="hs">Start position for hl</param>
-        /// <param name="nl">Line on the needle</param>
-        /// <param name="ns">Start position for nl</param>
-        /// <param name="max">Maximum acceptable difference^2</param>
-        private static bool SeachFor1Line(byte[][] hl, int hs, byte[][] nl, int ns, int max) {
-            byte[] hRGB, nRGB;
-            // actual 
-            int actual;
-            for(int x = 0; x < nl.Length - ns; x++) {
-                // Get rgb of the current pixel
-                hRGB = hl[x + hs];
-                nRGB = nl[x + ns];
-                // calculate the acutal difference^2 between the 2 colors
-                // (distance of 2 points in a 3D space)
-                actual = 0;
-                for(int i = 0; i < 3; i++) {
-                    actual += (hRGB[i] - nRGB[i]) * (hRGB[i] - nRGB[i]);
-                }
-                if(actual > max) {
-                    return false;
+        private static bool MatchPixel(byte[] rgb1, byte[] rgb2, int t) {
+            int actual = 0;
+            for(int i = 0; i < 3; i++) {
+                actual += (rgb1[i] - rgb2[i]) * (rgb1[i] - rgb2[i]);
+            }
+            return actual <= t;
+        }
+
+        private static bool MatchRegion(this byte[,][] a1, int x1, int y1, byte[,][] a2, int t) {
+            for(int x2 = 0; x2 < a2.GetLength(0); x2++) {
+                for(int y2 = 0; y2 < a2.GetLength(1); y2++) {
+                    if(!MatchPixel(a1[x1 + x2, y1 + y2], a2[x2, y2], t)) {
+                        return false;
+                    }
                 }
             }
             return true;
         }
 
         /// <summary>
-        /// Convert the bitmap to byte[][][]
+        /// Convert the bitmap to array
         /// </summary>
         /// <param name="bitmap"></param>
-        /// <returns>byte[y][x][r,g,b]</returns>
-        public static byte[][][] ToArray(this Bitmap bitmap) {
-            // byte[y][x][r,g,b]
-            byte[][][] array = new byte[bitmap.Height][][];
+        /// <returns>byte[x,y][]</returns>
+        private static byte[,][] ToArray(this Bitmap bitmap) {
+            byte[,][] array = new byte[bitmap.Width, bitmap.Height][];
+
             unsafe {
                 // Lock bitmap into memory
                 BitmapData data = bitmap.LockBits(
@@ -51,11 +46,10 @@ namespace Automate {
                 byte* firstPixel = (byte*)data.Scan0;
 
                 // scan through each row
-                for(int y = 0; y < heightInPixels; y++) {
-                    array[y] = new byte[bitmap.Width][];
+                for(int y = 0; y < bitmap.Height; y++) {
                     byte* currentLine = firstPixel + y * data.Stride;
                     for(int x = 0; x < widthInBytes; x += bytesPerPixel) {
-                        array[y][x / bytesPerPixel] = new byte[] {
+                        array[x / bytesPerPixel, y] = new byte[] {
                             currentLine[x + 2], // r
                             currentLine[x + 1], // g
                             currentLine[x], // b
@@ -75,24 +69,17 @@ namespace Automate {
         /// <param name="tolerance">Maximum difference between colors</param>
         /// <param name="result"></param>
         /// <returns>true if the needle is found</returns>
-        public static bool Match(this Bitmap heystack, Bitmap needle, int tolerance, out Point result) {
+        public static bool Seach(this Bitmap heystack, Bitmap needle, int tolerance, out Point result) {
             // tolerance squared
             tolerance *= tolerance;
 
-            byte[][][] harr = heystack.ToArray(), narr = needle.ToArray();
+            byte[,][] harr = heystack.ToArray(), narr = needle.ToArray();
             // heystack.Height - needle.Height, so the needle won't be outside of heystack (same for width)
-            for(int hy1 = 0; hy1 < heystack.Height - needle.Height; hy1++) {
+            for(int hy = 0; hy < heystack.Height - needle.Height; hy++) {
                 for(int hx = 0; hx < heystack.Width - needle.Width; hx++) {
-                    // if the first line matches
-                    if(SeachFor1Line(harr[hy1], hx, narr[0], 0, tolerance)) {
-                        for(int hy2 = hy1 + 1; hy2 < hy1 + narr.Length; hy2++) {
-                            // if one of the other lines doesn't match
-                            if(!SeachFor1Line(harr[hy2], hx, narr[hy2 - hy1], 0, tolerance)) {
-                                result = new Point();
-                                return false;
-                            }
-                        }
-                        result = new Point(hx + needle.Width / 2, hy1 + needle.Height / 2);
+                    if(MatchRegion(harr, hx, hy, narr, tolerance)) {
+                        // Get middle point
+                        result = new Point(hx + needle.Width / 2, hy + needle.Height / 2);
                         return true;
                     }
                 }
