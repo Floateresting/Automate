@@ -1,9 +1,40 @@
 ﻿using System.Drawing;
 using System.Drawing.Imaging;
-using System.Windows.Forms;
 
 namespace Automate {
     public static class BitmapExtensions {
+        /// <summary>Check if all pixels match for 1 line</summary>
+        /// <param name="hl">Line on the heystack</param>
+        /// <param name="hs">Start position for hl</param>
+        /// <param name="nl">Line on the needle</param>
+        /// <param name="ns">Start position for nl</param>
+        /// <param name="max">Maximum acceptable difference^2</param>
+        private static bool SeachFor1Line(byte[][] hl, int hs, byte[][] nl, int ns, int max) {
+            byte[] hRGB, nRGB;
+            // actual 
+            int actual;
+            for(int x = 0; x < nl.Length - ns; x++) {
+                // Get rgb of the current pixel
+                hRGB = hl[x + hs];
+                nRGB = nl[x + ns];
+                // calculate the acutal difference^2 between the 2 colors
+                // (distance of 2 points in a 3D space)
+                actual = 0;
+                for(int i = 0; i < 3; i++) {
+                    actual += (hRGB[i] - nRGB[i]) * (hRGB[i] - nRGB[i]);
+                }
+                if(actual > max) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Convert the bitmap to byte[][][]
+        /// </summary>
+        /// <param name="bitmap"></param>
+        /// <returns>byte[y][x][r,g,b]</returns>
         public static byte[][][] ToArray(this Bitmap bitmap) {
             // byte[y][x][r,g,b]
             byte[][][] array = new byte[bitmap.Height][][];
@@ -44,44 +75,19 @@ namespace Automate {
         /// <param name="tolerance">Maximum difference between colors</param>
         /// <param name="result"></param>
         /// <returns>true if the needle is found</returns>
-        public static bool Match(this Bitmap heystack, Bitmap needle,int tolerance,out Point result) {
-            /// <summary>Check if all pixels match for 1 line</summary>
-            /// <param name="hl">Line on the heystack</param>
-            /// <param name="hs">Start position for hl</param>
-            /// <param name="nl">Line on the needle</param>
-            /// <param name="ns">Start position for nl</param>
-            bool SeachFor1Line(byte[][] hl, int hs, byte[][] nl, int ns) {
-                byte[] hRGB, nRGB;
-                // actual 
-                int actual;
-                for(int x = 0; x < nl.Length - ns; x++) {
-                    // Get rgb of the current pixel
-                    hRGB = hl[x + hs];
-                    nRGB = nl[x + ns];
-                    // calculate the acutal difference^2 between the 2 colors
-                    // (distance of 2 points in a 3D space)
-                    actual = 0;
-                    for(int i = 0; i < 3; i++) {
-                        actual += (hRGB[i] - nRGB[i]) * (hRGB[i] - nRGB[i]);
-                    }
-                    if(actual > tolerance) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-
-            byte[][][] harr = heystack.ToArray(), narr = needle.ToArray();
+        public static bool Match(this Bitmap heystack, Bitmap needle, int tolerance, out Point result) {
             // tolerance squared
             tolerance *= tolerance;
+
+            byte[][][] harr = heystack.ToArray(), narr = needle.ToArray();
             // heystack.Height - needle.Height, so the needle won't be outside of heystack (same for width)
             for(int hy1 = 0; hy1 < heystack.Height - needle.Height; hy1++) {
                 for(int hx = 0; hx < heystack.Width - needle.Width; hx++) {
                     // if the first line matches
-                    if(SeachFor1Line(harr[hy1], hx, narr[0], 0)) {
+                    if(SeachFor1Line(harr[hy1], hx, narr[0], 0, tolerance)) {
                         for(int hy2 = hy1 + 1; hy2 < hy1 + narr.Length; hy2++) {
                             // if one of the other lines doesn't match
-                            if(!SeachFor1Line(harr[hy2], hx, narr[hy2 - hy1], 0)) {
+                            if(!SeachFor1Line(harr[hy2], hx, narr[hy2 - hy1], 0, tolerance)) {
                                 result = new Point();
                                 return false;
                             }
