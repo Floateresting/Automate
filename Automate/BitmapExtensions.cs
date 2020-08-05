@@ -1,30 +1,8 @@
 ﻿using System.Drawing;
 using System.Drawing.Imaging;
-using System.IO;
-using System.Linq;
-using System.Linq.Expressions;
 
 namespace Automate {
     public static class BitmapExtensions {
-        private static bool MatchPixel(byte[] rgb1, byte[] rgb2, int t) {
-            int actual = 0;
-            for(int i = 0; i < 3; i++) {
-                actual += (rgb1[i] - rgb2[i]) * (rgb1[i] - rgb2[i]);
-            }
-            return actual <= t;
-        }
-
-        private static bool MatchRegion(this byte[,][] a1, int x1, int y1, byte[,][] a2, int t) {
-            for(int x2 = 0; x2 < a2.GetLength(0); x2++) {
-                for(int y2 = 0; y2 < a2.GetLength(1); y2++) {
-                    if(!MatchPixel(a1[x1 + x2, y1 + y2], a2[x2, y2], t)) {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }
-
         /// <summary>
         /// Convert the bitmap to array
         /// </summary>
@@ -77,7 +55,7 @@ namespace Automate {
             // heystack.Height - needle.Height, so the needle won't be outside of heystack (same for width)
             for(int hy = 0; hy < heystack.Height - needle.Height; hy++) {
                 for(int hx = 0; hx < heystack.Width - needle.Width; hx++) {
-                    if(MatchRegion(harr, hx, hy, narr, tolerance)) {
+                    if(ByteArrayExtensions.MatchRegion(harr, hx, hy, narr, tolerance)) {
                         // Get middle point
                         result = new Point(hx + needle.Width / 2, hy + needle.Height / 2);
                         return true;
