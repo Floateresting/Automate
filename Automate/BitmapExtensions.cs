@@ -55,7 +55,7 @@ namespace Automate {
             // heystack.Height - needle.Height, so the needle won't be outside of heystack (same for width)
             for(int hy = 0; hy < heystack.Height - needle.Height; hy++) {
                 for(int hx = 0; hx < heystack.Width - needle.Width; hx++) {
-                    if(ByteArrayExtensions.MatchRegion(harr, hx, hy, narr, tolerance)) {
+                    if(ByteArrayExtensions.MatchesWidth(harr, hx, hy, narr, tolerance)) {
                         // Get middle point
                         result = new Point(hx + needle.Width / 2, hy + needle.Height / 2);
                         return true;
