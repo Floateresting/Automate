@@ -47,7 +47,7 @@ namespace Automate {
         /// <param name="tolerance">Maximum difference between colors</param>
         /// <param name="result"></param>
         /// <returns>true if the needle is found</returns>
-        public static bool Seach(this Bitmap heystack, Bitmap needle, int tolerance, out Point result) {
+        public static bool LocateBitmap(this Bitmap heystack, Bitmap needle, int tolerance, out Point result) {
             // tolerance squared
             tolerance *= tolerance;
 
@@ -55,9 +55,34 @@ namespace Automate {
             // heystack.Height - needle.Height, so the needle won't be outside of heystack (same for width)
             for(int hy = 0; hy < heystack.Height - needle.Height; hy++) {
                 for(int hx = 0; hx < heystack.Width - needle.Width; hx++) {
-                    if(ByteArrayExtensions.MatchesWidth(harr, hx, hy, narr, tolerance)) {
+                    if(harr.MatchesWidth(hx, hy, narr, tolerance)) {
                         // Get middle point
                         result = new Point(hx + needle.Width / 2, hy + needle.Height / 2);
+                        return true;
+                    }
+                }
+            }
+            result = new Point();
+            return false;
+        }
+
+        /// <summary>
+        /// Search for a solid color
+        /// </summary>
+        /// <param name="heystack"></param>
+        /// <param name="color"></param>
+        /// <param name="size"></param>
+        /// <param name="tolerance"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        public static bool LocateColor(this Bitmap heystack, byte[] color, Size size, int tolerance, out Point result) {
+            // basically the same process as LocateBitmap
+            tolerance *= tolerance;
+            byte[,][] harr = heystack.ToArray();
+            for(int hy = 0; hy < heystack.Height - size.Height; hy++) {
+                for(int hx = 0; hx < heystack.Width - size.Width; hx++) {
+                    if(harr.MatchesWidth(hx, hy, color, size, tolerance)) {
+                        result = new Point(hx + size.Width / 2, hy + size.Height / 2);
                         return true;
                     }
                 }

@@ -36,5 +36,26 @@ namespace Automate {
             }
             return true;
         }
+
+        /// <summary>
+        /// Indicates whether part of the region is a solid color
+        /// </summary>
+        /// <param name="region1">The bigger region</param>
+        /// <param name="x1">Start x position for region1</param>
+        /// <param name="y1">Start x position for region1</param>
+        /// <param name="color"></param>
+        /// <param name="size">Size of the solid color region</param>
+        /// <param name="t">tolerance squared</param>
+        /// <returns></returns>
+        internal static bool MatchesWidth(this byte[,][] region1, int x1, int y1, byte[] color, Size size, int t) {
+            for(int x = 0; x < size.Width; x++) {
+                for(int y = 0; y < size.Height; y++) {
+                    if(!region1[x1 + x, y1 + y].MatchesWith(color, t)) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
     }
 }
