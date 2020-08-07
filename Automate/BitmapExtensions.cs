@@ -40,7 +40,7 @@ namespace Automate {
         }
 
         /// <summary>
-        /// Seach for a bitmap image
+        /// Search for a bitmap image
         /// </summary>
         /// <param name="heystack"></param>
         /// <param name="needle">The template/smaller image</param>
