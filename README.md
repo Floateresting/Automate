@@ -44,39 +44,21 @@ class Program {
 
 ~~~
 
-### Automate.Window
+### Bitmap Extensions
 Features
-  - Find a image on screen with optional tolerance (returns the first match)
-  - Find a image on screen with optional tolerance (returns the all matches)
-  - Get actual tolerance of the image found on screen
-  - Save a screenshot to a bitmap file (.bmp)
+  - Find a bitmap with tolerance (returns the first match)
 
 ##### Examples
 ~~~cs
 class Program {
-    // By default it will use the entire screen
-    private readonly static Window window1 = new Window();
-    // Only 1280x720 from the top-left corner
-    private readonly static Window window2 = new Window(0, 0, 1280, 720);
-    // 1280x720 from (100, 100)
-    private readonly static Window window3 = new Window(new Point(100, 100), new Size(1280, 720));
-
     static void Main(string[] args) {
-        // Search for the exact image (no tolerance)
-        bool sucess1 = window1.LocateOnScreen("template.bmp", out Point result1);
-        // Search for the image with tolerance 30, from (500, 500) to (600, 600) of the screen
-        bool sucess2 = window2.LocateOnScreen("template.bmp", out Point result2, 30, new Point(500, 500), new Size(100, 100));
-        // Get the actual tolerance found on screen with estimated tolenance of 60
-        bool sucess3 = window3.LocateOnScreen("template.bmp", out _, out double actualTolerance, 60);
-        // Search for all matches on the screen, where each match's distance is larger than 30 px 
-        bool sucess4 = window1.LocateAllOnScreen("template.bmp", 30, out List<Point> results, 40);
-
-        // Save screenshot to 'Capture.bmp'
-        window1.SaveScreenshot("Capture.bmp");
-        // Save screenshot to 'Capture.bmp', from (200, 200) to (600, 600) of the screen
-        window2.SaveScreenshot("Capture", new Point(200, 200), new Size(400, 400));
-        // Save screenshot to 'Screenshot.bmp'
-        window3.SaveScreenshot();
+        // heystack can be an entire screenshot
+        Bitmap heystack = new Bitmap("/path/to/heystack.bmp");
+        Bitmap needle = new Bitmap("/path/to/needle.bmp");
+        // search for a 10x10px solid color #161616 (r22, g22, b22) with tolerance of 5
+        bool sucess0 = heystack.LocateColor(new byte[] { 22, 22, 22 }, new Size(10, 10), 5, out Point p0);
+        // seach for needle.bmp with tolerance of 10
+        bool sucess1 = heystack.LocateBitmap(needle, 10, out Point p1);
     }
 }
 
