@@ -52,13 +52,17 @@ Features
 ~~~cs
 class Program {
     static void Main(string[] args) {
-        // heystack can be an entire screenshot
+        // The heystack can be an entire screenshot
         Bitmap heystack = new Bitmap("/path/to/heystack.bmp");
         Bitmap needle = new Bitmap("/path/to/needle.bmp");
-        // search for a 10x10px solid color #161616 (r22, g22, b22) with tolerance of 5
-        bool sucess0 = heystack.LocateColor(new byte[] { 22, 22, 22 }, new Size(10, 10), 5, out Point p0);
-        // seach for needle.bmp with tolerance of 10
-        bool sucess1 = heystack.LocateBitmap(needle, 10, out Point p1);
+        // Search for a 10x10px solid color #161616 (r22, g22, b22) with tolerance of 5
+        Point p0 = heystack.LocateColor(new byte[] { 22, 22, 22 }, new Size(10, 10), 5);
+        // Search for needle.bmp with tolerance of 10
+        Point p1 = heystack.LocateBitmap(needle, 10);
+        // Use IsEmpty to check if found
+        if(p1.IsEmpty){
+            // do stuff
+        }
     }
 }
 
