@@ -26,7 +26,7 @@ namespace Automate {
         /// <param name="region2">the smaller region</param>
         /// <param name="t">tolerance squared</param>
         /// <returns></returns>
-        internal static bool MatchesWidth(this byte[,][] region1, int x1, int y1, byte[,][] region2, int t) {
+        internal static bool MatchesWith(this byte[,][] region1, int x1, int y1, byte[,][] region2, int t) {
             for(int x2 = 0; x2 < region2.GetLength(0); x2++) {
                 for(int y2 = 0; y2 < region2.GetLength(1); y2++) {
                     if(!region1[x1 + x2, y1 + y2].MatchesWith(region2[x2, y2], t)) {
@@ -47,7 +47,7 @@ namespace Automate {
         /// <param name="size">Size of the solid color region</param>
         /// <param name="t">tolerance squared</param>
         /// <returns></returns>
-        internal static bool MatchesWidth(this byte[,][] region1, int x1, int y1, byte[] color, Size size, int t) {
+        internal static bool MatchesWith(this byte[,][] region1, int x1, int y1, byte[] color, Size size, int t) {
             for(int x = 0; x < size.Width; x++) {
                 for(int y = 0; y < size.Height; y++) {
                     if(!region1[x1 + x, y1 + y].MatchesWith(color, t)) {
