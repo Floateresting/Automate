@@ -43,13 +43,12 @@ namespace Automate {
         }
 
         /// <summary>
-        /// Search for a bitmap image
+        /// Search for a bitmap image, return the 1st result
         /// </summary>
         /// <param name="heystack"></param>
         /// <param name="needle">The template/smaller image</param>
         /// <param name="tolerance">Maximum difference between colors</param>
-        /// <param name="result"></param>
-        /// <returns>true if the needle is found</returns>
+        /// <returns></returns>
         public static Point LocateBitmap(this Bitmap heystack, Bitmap needle, int tolerance) {
             // tolerance squared
             tolerance *= tolerance;
@@ -67,22 +66,30 @@ namespace Automate {
             return Point.Empty;
         }
 
-        public static IEnumerable<Point> LocateBitmapAll(this Bitmap h, Bitmap n, int t, int d) {
-            t *= t;
+        /// <summary>
+        /// Search for a bitmap image, return the all results
+        /// </summary>
+        /// <param name="heystack"></param>
+        /// <param name="needle">The template/smaller image</param>
+        /// <param name="tolerance">Maximum difference between colors</param>
+        /// <param name="distance">Minimum distance between 2 found regions</param>
+        /// <returns></returns>
+        public static IEnumerable<Point> LocateBitmapAll(this Bitmap heystack, Bitmap needle, int tolerance, int distance) {
+            tolerance *= tolerance;
             List<Rectangle> covered = new List<Rectangle>();
-            byte[,][] harr = h.ToArray(), narr = n.ToArray();
-            for(int hy = 0; hy < h.Height - n.Height; hy++) {
-                for(int hx = 0; hx < h.Width - n.Width; hx++) {
+            byte[,][] harr = heystack.ToArray(), narr = needle.ToArray();
+            for(int hy = 0; hy < heystack.Height - needle.Height; hy++) {
+                for(int hx = 0; hx < heystack.Width - needle.Width; hx++) {
                     // Skip pixels that are in found results
                     if(covered.Select(r => r.Contains(hx, hy)).Any()) continue;
                     // Add rect and retun point if matches
-                    if(harr.MatchesWith(hx, hy, narr, t)) {
+                    if(harr.MatchesWith(hx, hy, narr, tolerance)) {
                         // The needle but with distance
-                        covered.Add(new Rectangle(hx - d, hy - d, n.Width + d, n.Height + d));
+                        covered.Add(new Rectangle(hx - distance, hy - distance, needle.Width + distance, needle.Height + distance));
 
-                        yield return new Point(hx + n.Width / 2, hy + n.Height / 2);
+                        yield return new Point(hx + needle.Width / 2, hy + needle.Height / 2);
                         // continue outside the needle
-                        hx += n.Width;
+                        hx += needle.Width;
                     }
                 }
             }
