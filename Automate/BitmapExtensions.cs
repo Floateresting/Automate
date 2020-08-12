@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Automate {
     public static class BitmapExtensions {
@@ -56,13 +58,34 @@ namespace Automate {
             // heystack.Height - needle.Height, so the needle won't be outside of heystack (same for width)
             for(int hy = 0; hy < heystack.Height - needle.Height; hy++) {
                 for(int hx = 0; hx < heystack.Width - needle.Width; hx++) {
-                    if(harr.MatchesWidth(hx, hy, narr, tolerance)) {
+                    if(harr.MatchesWith(hx, hy, narr, tolerance)) {
                         // return middle point
                         return new Point(hx + needle.Width / 2, hy + needle.Height / 2);
                     }
                 }
             }
             return Point.Empty;
+        }
+
+        public static IEnumerable<Point> LocateBitmapAll(this Bitmap h, Bitmap n, int t, int d) {
+            t *= t;
+            List<Rectangle> covered = new List<Rectangle>();
+            byte[,][] harr = h.ToArray(), narr = n.ToArray();
+            for(int hy = 0; hy < h.Height - n.Height; hy++) {
+                for(int hx = 0; hx < h.Width - n.Width; hx++) {
+                    // Skip pixels that are in found results
+                    if(covered.Select(r => r.Contains(hx, hy)).Any()) continue;
+                    // Add rect and retun point if matches
+                    if(harr.MatchesWith(hx, hy, narr, t)) {
+                        // The needle but with distance
+                        covered.Add(new Rectangle(hx - d, hy - d, n.Width + d, n.Height + d));
+
+                        yield return new Point(hx + n.Width / 2, hy + n.Height / 2);
+                        // continue outside the needle
+                        hx += n.Width;
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -80,7 +103,7 @@ namespace Automate {
             byte[,][] harr = heystack.ToArray();
             for(int hy = 0; hy < heystack.Height - size.Height; hy++) {
                 for(int hx = 0; hx < heystack.Width - size.Width; hx++) {
-                    if(harr.MatchesWidth(hx, hy, color, size, tolerance)) {
+                    if(harr.MatchesWith(hx, hy, color, size, tolerance)) {
                         return new Point(hx + size.Width / 2, hy + size.Height / 2);
                     }
                 }
