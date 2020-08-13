@@ -2,7 +2,6 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 
 namespace Automate {
     public static class BitmapExtensions {
@@ -77,6 +76,7 @@ namespace Automate {
         public static IEnumerable<Point> LocateBitmapAll(this Bitmap heystack, Bitmap needle, int tolerance, int distance) {
             tolerance *= tolerance;
             List<Rectangle> covered = new List<Rectangle>();
+
             byte[,][] harr = heystack.ToArray(), narr = needle.ToArray();
             for(int hy = 0; hy < heystack.Height - needle.Height; hy++) {
                 for(int hx = 0; hx < heystack.Width - needle.Width; hx++) {
@@ -102,10 +102,8 @@ namespace Automate {
         /// <param name="color"></param>
         /// <param name="size"></param>
         /// <param name="tolerance"></param>
-        /// <param name="result"></param>
         /// <returns></returns>
         public static Point LocateColor(this Bitmap heystack, byte[] color, Size size, int tolerance) {
-            // basically the same process as LocateBitmap
             tolerance *= tolerance;
             byte[,][] harr = heystack.ToArray();
             for(int hy = 0; hy < heystack.Height - size.Height; hy++) {
@@ -116,6 +114,32 @@ namespace Automate {
                 }
             }
             return Point.Empty;
+        }
+
+        /// <summary>
+        /// Search for a solid color, return the all results
+        /// </summary>
+        /// <param name="heystack"></param>
+        /// <param name="color"></param>
+        /// <param name="size"></param>
+        /// <param name="tolerance"></param>
+        /// <param name="distance">Minimum distance between 2 found regions</param>
+        /// <returns></returns>
+        public static IEnumerable<Point> LocateColorAll(this Bitmap heystack, byte[] color, Size size, int tolerance, int distance) {
+            tolerance *= tolerance;
+            List<Rectangle> covered = new List<Rectangle>();
+
+            byte[,][] harr = heystack.ToArray();
+            for(int hy = 0; hy < heystack.Height - size.Height; hy++) {
+                for(int hx = 0; hx < heystack.Width - size.Width; hx++) {
+                    if(covered.Select(c => c.Contains(hx, hy)).Any()) continue;
+                    if(harr.MatchesWith(hx, hy, color, size, tolerance)) {
+                        covered.Add(new Rectangle(hx - distance, hy - distance, size.Width + distance, size.Height + distance));
+                        yield return new Point(hx + size.Width / 2, hy + size.Height / 2);
+                        hx += size.Width;
+                    }
+                }
+            }
         }
     }
 }
