@@ -1,13 +1,10 @@
-﻿using Microsoft.Win32;
-using System;
-using System.CodeDom;
-using System.Collections.Generic;
+﻿using System;
+using System.Configuration;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using System.Security.Cryptography;
 using System.Text;
-using System.Threading;
 
 namespace Automate.Android.DebugBridge {
     public class Client : IDisposable {
@@ -16,6 +13,7 @@ namespace Automate.Android.DebugBridge {
 
         private readonly TcpClient tc;
         private readonly NetworkStream ns;
+        private readonly BinaryReader br;
 
         #region Constructor
 
@@ -23,8 +21,11 @@ namespace Automate.Android.DebugBridge {
         public Client(IPEndPoint p) {
             this.tc = new TcpClient();
             this.tc.Connect(p);
-            this.ns = tc.GetStream();
+
+            this.ns = this.tc.GetStream();
             this.ns.ReadTimeout = 2000;
+
+            this.br = new BinaryReader(this.ns, Client.Encoding);
         }
         #endregion Constructor
 
@@ -34,15 +35,27 @@ namespace Automate.Android.DebugBridge {
         }
 
         public string ReadString() {
-            using StreamReader sr = new StreamReader(this.ns, Client.Encoding);
-            return sr.ReadToEnd();
+            this.EnsureSucess();
+            return this.br.ReadString();
         }
 
+        public void EnsureSucess() {
+            if(Client.Encoding.GetString(this.br.ReadBytes(4)) != "OKAY") {
+                Debugger.Break();
+            }
+        }
+
+        public void SetDevice(Device d) {
+            if(d != null) {
+                this.Write($"host:transport:{d.Serial}");
+
+            }
+        }
         #region Implementation
 
         public void Dispose() {
-            tc.Dispose();
-        } 
+            this.tc.Dispose();
+        }
         #endregion Implementation
     }
 }
