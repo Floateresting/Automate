@@ -3,8 +3,17 @@ using System.Text.RegularExpressions;
 
 namespace Automate.Android.DebugBridge {
     public class Device {
+        #region Regex
+
+        /// <summary>
+        /// Used to parse the information returned by adb
+        /// </summary>
         internal const string RegexString = @"^(?<serial>[a-zA-Z0-9_-]+(?:\s?[\.a-zA-Z0-9_-]+)?(?:\:\d{1,})?)\s+(?<state>device|connecting|offline|unknown|bootloader|recovery|download|authorizing|unauthorized|host|no permissions)(?<message>.*?)(\s+usb:(?<usb>[^:]+))?(?:\s+product:(?<product>[^:]+))?(\s+model\:(?<model>[\S]+))?(\s+device\:(?<device>[\S]+))?(\s+features:(?<features>[^:]+))?(\s+transport_id:(?<transport_id>[^:]+))?$";
         internal static readonly Regex Regex = new Regex(Device.RegexString, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        #endregion Regex
+
+        #region Properties
+
         public string Serial { get; set; }
         public DeviceState State { get; set; }
         public string Model { get; set; }
@@ -14,6 +23,7 @@ namespace Automate.Android.DebugBridge {
         public string Usb { get; set; }
         public string TransportId { get; set; }
         public string Message { get; set; }
+        #endregion Properties
 
         public static Device FromString(string s) {
             Match m = Device.Regex.Match(s);

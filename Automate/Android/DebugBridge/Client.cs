@@ -29,6 +29,10 @@ namespace Automate.Android.DebugBridge {
         }
         #endregion Constructor
 
+        /// <summary>
+        /// Send request to adb
+        /// </summary>
+        /// <param name="s"></param>
         public void Write(string s) {
             byte[] data = s.ToAdbBytes(Client.Encoding);
             this.ns.Write(data, 0, data.Length);
@@ -39,6 +43,9 @@ namespace Automate.Android.DebugBridge {
             return this.br.ReadString();
         }
 
+        /// <summary>
+        /// Read 4 bytes of data and make sure it's sucessful
+        /// </summary>
         public void EnsureSucess() {
             if(Client.Encoding.GetString(this.br.ReadBytes(4)) != "OKAY") {
                 Debugger.Break();
@@ -48,9 +55,9 @@ namespace Automate.Android.DebugBridge {
         public void SetDevice(Device d) {
             if(d != null) {
                 this.Write($"host:transport:{d.Serial}");
-
             }
         }
+
         #region Implementation
 
         public void Dispose() {
