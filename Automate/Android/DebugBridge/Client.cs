@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Automate.Android.DebugBridge {
     public class Client : IDisposable {
@@ -33,9 +33,9 @@ namespace Automate.Android.DebugBridge {
         /// Send request to adb
         /// </summary>
         /// <param name="s"></param>
-        public void Write(string s) {
+        public async Task WriteAsync(string s) {
             byte[] data = s.ToAdbBytes(Client.Encoding);
-            this.ns.Write(data, 0, data.Length);
+            await this.ns.WriteAsync(data, 0, data.Length);
         }
 
         public string ReadString() {
@@ -52,9 +52,9 @@ namespace Automate.Android.DebugBridge {
             }
         }
 
-        public void SetDevice(Device d) {
+        public async Task SetDevice(Device d) {
             if(d != null) {
-                this.Write($"host:transport:{d.Serial}");
+                await this.WriteAsync($"host:transport:{d.Serial}");
             }
         }
 
