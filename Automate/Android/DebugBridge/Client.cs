@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -29,6 +30,12 @@ namespace Automate.Android.DebugBridge {
         }
         #endregion Constructor
 
+        public async Task<string> GetStringAsync(string s) {
+            await this.WriteAsync(s);
+            this.EnsureSucess();
+            return this.br.ReadString();
+        }
+
         /// <summary>
         /// Send request to adb
         /// </summary>
@@ -36,11 +43,6 @@ namespace Automate.Android.DebugBridge {
         public async Task WriteAsync(string s) {
             byte[] data = s.ToAdbBytes(Client.Encoding);
             await this.ns.WriteAsync(data, 0, data.Length);
-        }
-
-        public string ReadString() {
-            this.EnsureSucess();
-            return this.br.ReadString();
         }
 
         /// <summary>
