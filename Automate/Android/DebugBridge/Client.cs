@@ -32,7 +32,6 @@ namespace Automate.Android.DebugBridge {
 
         public async Task<string> GetStringAsync(string s) {
             await this.WriteAsync(s);
-            this.EnsureSucess();
             return this.br.ReadString();
         }
 
@@ -43,6 +42,7 @@ namespace Automate.Android.DebugBridge {
         public async Task WriteAsync(string s) {
             byte[] data = s.ToAdbBytes(Client.Encoding);
             await this.ns.WriteAsync(data, 0, data.Length);
+            this.EnsureSucess();
         }
 
         /// <summary>
@@ -51,12 +51,6 @@ namespace Automate.Android.DebugBridge {
         public void EnsureSucess() {
             if(Client.Encoding.GetString(this.br.ReadBytes(4)) != "OKAY") {
                 Debugger.Break();
-            }
-        }
-
-        public async Task SetDevice(Device d) {
-            if(d != null) {
-                await this.WriteAsync($"host:transport:{d.Serial}");
             }
         }
 
