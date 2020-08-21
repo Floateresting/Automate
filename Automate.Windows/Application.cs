@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
 
-namespace Automate {
+namespace Automate.Windows {
     /// <summary>
     /// Class for set focus, resize or move an application
     /// </summary>

@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Runtime.InteropServices;
 
-namespace Automate {
+namespace Automate.Windows {
     /// <summary>
     /// Useful tools
     /// </summary>

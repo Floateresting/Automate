@@ -2,7 +2,7 @@
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 
-namespace Automate {
+namespace Automate.Windows {
     /// <summary>
     /// Class for searching image on screen, take screenshots
     /// </summary>

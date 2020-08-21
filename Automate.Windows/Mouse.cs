@@ -3,7 +3,7 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Threading;
 
-namespace Automate {
+namespace Automate.Windows {
     /// <summary>
     /// Class for get mouse position, set mouse position, perform clicks or drags
     /// </summary>
