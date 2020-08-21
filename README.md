@@ -2,10 +2,9 @@
 Control mouse, search image on screen and resize third-party application
 
 
-### Usage
-Build the library, and add reference
+## Automate.Windows
 
-### Automate.Mouse
+### Automate.Windows.Mouse
 Features
   - Get mouse position
   - Set mouse position
@@ -14,8 +13,7 @@ Features
 
 ###### Examples
 ~~~cs
-using System.Drawing;
-using Automate;
+using Automate.Windows;
 
 class Program {
     private readonly static Mouse mouse = new Mouse();
