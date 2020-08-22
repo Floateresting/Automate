@@ -1,8 +1,4 @@
-﻿using Microsoft.Win32.SafeHandles;
-using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Net.Sockets;
+﻿using System.Linq;
 
 namespace Automate.Android {
     public class Client {

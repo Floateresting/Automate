@@ -9,20 +9,20 @@ namespace Automate.Android {
         #region Properties
 
         /// <summary>
-        /// Gets a value that indicates whether a <see cref="Socket"/>is connected
+        /// Gets a value that indicates whether a <see cref="System.Net.Sockets.Socket"/>is connected
         /// </summary>
-        public bool Connected { get => this.s.Connected; }
+        public bool Connected { get => this.Socket.Connected; }
         /// <summary>
         /// Gets the amount of data that has been received from the network and is available to be read.
         /// </summary>
-        public int Available { get => this.s.Available; }
+        public int Available { get => this.Socket.Available; }
         #endregion Properties
 
-        private readonly Socket s;
+        public Socket Socket { get; set; }
 
         public TcpSocket(string host, int port) {
-            this.s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            this.s.Connect(host, port);
+            this.Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            this.Socket.Connect(host, port);
         }
 
         #region Public
@@ -54,29 +54,12 @@ namespace Automate.Android {
         /// <param name="s"></param>
         /// <returns></returns>
         public bool Send(string s) {
-            this.s.Send(Protocol.Encode(s));
+            this.Socket.Send(Protocol.Encode(s));
             return this.CheckStatus();
         }
         #endregion Public
 
         #region Internal
-
-        /// <summary>
-        /// Read all data 
-        /// </summary>
-        /// <returns></returns>
-        internal byte[] ReceiveAll() {
-            List<byte> bytes = new List<byte>();
-            byte[] buffer;
-            while(this.s.Available > 0) {
-                // Available will not be greater than ReceiveBufferSize
-                buffer = new byte[this.s.Available];
-                this.s.Receive(buffer);
-                bytes.AddRange(buffer);
-            }
-            return bytes.ToArray();
-        }
-
         /// <summary>
         /// Read bytes from the socket
         /// </summary>
@@ -84,7 +67,7 @@ namespace Automate.Android {
         /// <returns></returns>
         internal byte[] Receive(int length) {
             byte[] buffer = new byte[length];
-            this.s.Receive(buffer);
+            this.Socket.Receive(buffer);
             return buffer;
         }
 
@@ -99,7 +82,7 @@ namespace Automate.Android {
         #endregion Internal
 
         public void Dispose() {
-            this.s.Dispose();
+            this.Socket.Dispose();
         }
     }
 }
