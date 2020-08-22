@@ -1,15 +1,21 @@
 ﻿using Microsoft.Win32.SafeHandles;
 using System;
+using System.Diagnostics;
+using System.Linq;
 using System.Net.Sockets;
 
 namespace Automate.Android {
-    public class Client{
+    public class Client {
         public string Host { get; set; }
         public int Port { get; set; }
 
         public Client(string hostname = "127.0.0.1", int port = 5037) {
             this.Host = hostname;
             this.Port = port;
+        }
+
+        internal TcpSocket CreateSocket() {
+            return new TcpSocket(this.Host, this.Port);
         }
 
         /// <summary>
@@ -19,7 +25,7 @@ namespace Automate.Android {
         /// <param name="receive"></param>
         /// <returns></returns>
         public string Send(string s, bool receive = true) {
-            using TcpSocket tc = new TcpSocket(this.Host, this.Port);
+            using TcpSocket tc = this.CreateSocket();
             tc.Send(s);
             if(receive) {
                 string result = tc.GetString();
@@ -34,8 +40,12 @@ namespace Automate.Android {
         ///  Get a list of devices available for communication
         /// </summary>
         /// <returns></returns>
-        public string Devices() {
-            return this.Send("host:devices");
+        public Device[] Devices() {
+            return this.Send("host:devices")
+                .Split("\n")
+                .Where(l => !string.IsNullOrWhiteSpace(l))
+                .Select(l => new Device(this, l.Split()[0]))
+                .ToArray();
         }
     }
 }
