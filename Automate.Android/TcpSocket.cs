@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Net.Sockets;
 
 namespace Automate.Android {
     public class TcpSocket : IDisposable {
         #region Properties
-        
+
         /// <summary>
         /// Gets a value that indicates whether a <see cref="Socket"/>is connected
         /// </summary>
@@ -57,14 +59,30 @@ namespace Automate.Android {
         }
         #endregion Public
 
-        #region Private
+        #region Internal
+
+        /// <summary>
+        /// Read all data 
+        /// </summary>
+        /// <returns></returns>
+        internal byte[] ReceiveAll() {
+            List<byte> bytes = new List<byte>();
+            byte[] buffer;
+            while(this.s.Available > 0) {
+                // Available will not be greater than ReceiveBufferSize
+                buffer = new byte[this.s.Available];
+                this.s.Receive(buffer);
+                bytes.AddRange(buffer);
+            }
+            return bytes.ToArray();
+        }
 
         /// <summary>
         /// Read bytes from the socket
         /// </summary>
         /// <param name="length">Number of bytes to read</param>
         /// <returns></returns>
-        private byte[] Receive(int length) {
+        internal byte[] Receive(int length) {
             byte[] buffer = new byte[length];
             this.s.Receive(buffer);
             return buffer;
@@ -75,10 +93,10 @@ namespace Automate.Android {
         /// </summary>
         /// <param name="length">Number of bytes to read</param>
         /// <returns></returns>
-        private string ReceiveString(int length) {
+        internal string ReceiveString(int length) {
             return Protocol.Decode(this.Receive(length));
         }
-        #endregion Private
+        #endregion Internal
 
         public void Dispose() {
             this.s.Dispose();
