@@ -13,11 +13,22 @@ namespace Automate.Android {
         public const string SEND = "SEND";
         public const string QUIT = "QUIT";
 
+        /// <summary>
+        /// Decode bytes received from ADB
+        /// </summary>
+        /// <param name="b"></param>
+        /// <returns></returns>
         public static string Decode(byte[] b) {
             return Encoding.UTF8.GetString(b);
         }
 
+        /// <summary>
+        /// Encode a string to bytes for ADB
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static byte[] Encode(string s) {
+            // Length in hex + message
             return Encoding.UTF8.GetBytes(s.Length.ToString("x4") + s);
         }
     }
