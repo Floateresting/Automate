@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Net.Sockets;
 
 namespace Automate.Android {
@@ -11,11 +9,11 @@ namespace Automate.Android {
         /// <summary>
         /// Gets a value that indicates whether a <see cref="System.Net.Sockets.Socket"/>is connected
         /// </summary>
-        public bool Connected { get => this.Socket.Connected; }
+        public bool Connected => this.Socket.Connected;
         /// <summary>
         /// Gets the amount of data that has been received from the network and is available to be read.
         /// </summary>
-        public int Available { get => this.Socket.Available; }
+        public int Available => this.Socket.Available;
         #endregion Properties
 
         public Socket Socket { get; set; }
