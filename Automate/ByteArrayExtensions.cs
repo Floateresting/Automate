@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace Automate {
     public static class ByteArrayExtensions {
@@ -11,6 +12,7 @@ namespace Automate {
         /// <returns></returns>
         internal static bool MatchesWith(this byte[] pixel1, byte[] pixel2, int t) {
             int actual = 0;
+            // Transparent pixels: not implemented
             for(int i = 0; i < 3; i++) {
                 actual += (pixel1[i] - pixel2[i]) * (pixel1[i] - pixel2[i]);
             }
@@ -56,6 +58,32 @@ namespace Automate {
                 }
             }
             return true;
+        }
+
+        /// <summary>
+        /// Convert byte array to a <see cref="Bitmap"/> by not using <see cref="Bitmap.SetPixel(int, int, Color)"/>
+        /// </summary>
+        /// <param name="a">byte array received from screencap (adb)</param>
+        /// <returns></returns>
+        public static Bitmap ToBitmap(this byte[,][] a) {
+            int w = a.GetLength(0), h = a.GetLength(1);
+            Bitmap b = new Bitmap(w, h);
+            Rectangle rect = new Rectangle(0, 0, w, h);
+            BitmapData d = b.LockBits(rect, ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+            int s = d.Stride;
+            unsafe {
+                byte* ptr = (byte*)d.Scan0;
+                for(int x = 0; x < w; x++) {
+                    for(int y = 0; y < h; y++) {
+                        ptr[x * 4 + y * s] = a[x, y][2]; // b
+                        ptr[x * 4 + y * s + 1] = a[x, y][1]; // g
+                        ptr[x * 4 + y * s + 2] = a[x, y][0]; // r
+                        ptr[x * 4 + y * s + 3] = a[x, y][3]; // a
+                    }
+                }
+            }
+            b.UnlockBits(d);
+            return b;
         }
     }
 }
