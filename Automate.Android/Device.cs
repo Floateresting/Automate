@@ -19,11 +19,10 @@ namespace Automate.Android {
         /// <seealso href="https://android.googlesource.com/platform/frameworks/base/+/android-4.3_r2.3/cmds/screencap/screencap.cpp#191"/>
         /// <returns>byte[x,y][] of {r, g, b, a}</returns>
         public byte[,][] Screencap() {
-            using TcpSocket ts = this.CreateSocket();
-            ts.Send($"shell:/system/bin/screencap");
-
+            using TcpSocket ts = this.Shell("screencap");
             using NetworkStream ns = new NetworkStream(ts.Socket);
             using BinaryReader br = new BinaryReader(ns);
+
             // width, height, pixel format
             int w = br.ReadInt32();
             int h = br.ReadInt32();
@@ -43,6 +42,12 @@ namespace Automate.Android {
                 }
             }
             return raw;
+        }
+
+        public TcpSocket Shell(string s) {
+            TcpSocket ts = this.CreateSocket();
+            ts.Send($"shell:{s}");
+            return ts;
         }
 
         private void Transport(TcpSocket ts) {
