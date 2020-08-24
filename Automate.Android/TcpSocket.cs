@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Net.Sockets;
 
@@ -24,27 +25,13 @@ namespace Automate.Android {
             this.Socket.Connect(host, port);
         }
 
-        #region Public
-
         /// <summary>
         /// Read the length(4 bytes) and a string
         /// </summary>
         /// <returns></returns>
-        public string GetString() {
+        internal string GetString() {
             int length = int.Parse(this.ReceiveString(4), NumberStyles.HexNumber);
             return this.ReceiveString(length);
-        }
-
-        /// <summary>
-        /// Read 4 bytes and check if it's <see cref="Protocol.OKAY"/>
-        /// </summary>
-        /// <returns></returns>
-        public bool CheckStatus() {
-            string status = this.ReceiveString(4);
-            if(status != Protocol.OKAY) {
-                throw new Exception("Not okay");
-            }
-            return true;
         }
 
         /// <summary>
@@ -52,13 +39,11 @@ namespace Automate.Android {
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        public bool Send(string s) {
+        internal bool Send(string s) {
             this.Socket.Send(Protocol.Encode(s));
             return this.CheckStatus();
         }
-        #endregion Public
 
-        #region Internal
         /// <summary>
         /// Read bytes from the socket
         /// </summary>
@@ -70,6 +55,16 @@ namespace Automate.Android {
             return buffer;
         }
 
+        internal byte[] ReceiveAll() {
+            using NetworkStream ns = new NetworkStream(this.Socket);
+            int i;
+            List<byte> bs = new List<byte>();
+            while((i = ns.ReadByte()) != -1) {
+                bs.Add((byte)i);
+            }
+            return bs.ToArray();
+        }
+
         /// <summary>
         /// Read bytes from the socket and convert to string
         /// </summary>
@@ -78,7 +73,20 @@ namespace Automate.Android {
         internal string ReceiveString(int length) {
             return Protocol.Decode(this.Receive(length));
         }
-        #endregion Internal
+
+        /// <summary>
+        /// Read 4 bytes and check if it's <see cref="Protocol.OKAY"/>
+        /// </summary>
+        /// <returns></returns>
+        internal bool CheckStatus() {
+            string status = this.ReceiveString(4);
+            if(status != Protocol.OKAY) {
+                throw new Exception("Not okay");
+            }
+            return true;
+        }
+
+
 
         public void Dispose() {
             this.Socket.Dispose();

@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Net.Sockets;
+using System.Threading;
 
 namespace Automate.Android {
     public class Device {
@@ -19,52 +21,55 @@ namespace Automate.Android {
         /// <seealso href="https://android.googlesource.com/platform/frameworks/base/+/android-4.3_r2.3/cmds/screencap/screencap.cpp#191"/>
         /// <returns>byte[x,y][] of {r, g, b, a}</returns>
         public byte[,][] Screencap() {
-            using TcpSocket ts = this.Shell("screencap");
-            using NetworkStream ns = new NetworkStream(ts.Socket);
-            using BinaryReader br = new BinaryReader(ns);
+            return this.Shell("screencap", ts => {
+                using NetworkStream ns = new NetworkStream(ts.Socket);
+                using BinaryReader br = new BinaryReader(ns);
 
-            #region Read Raw Data
+                #region Read Raw Data
 
-            // width, height, pixel format
-            int w = br.ReadInt32();
-            int h = br.ReadInt32();
-            int f = br.ReadInt32();
+                // width, height, pixel format
+                int w = br.ReadInt32();
+                int h = br.ReadInt32();
+                int f = br.ReadInt32();
 
-            if(f != 1) throw new Exception("This is not rgba_8888 format");
+                if(f != 1) throw new Exception("This is not rgba_8888 format");
 
-            byte[,][] raw = new byte[w, h][];
-            for(int y = 0; y < h; y++) {
-                for(int x = 0; x < w; x++) {
-                    raw[x, y] = new byte[] {
+                byte[,][] raw = new byte[w, h][];
+                for(int y = 0; y < h; y++) {
+                    for(int x = 0; x < w; x++) {
+                        raw[x, y] = new byte[] {
                         br.ReadByte(), // r
                         br.ReadByte(), // g
                         br.ReadByte(), // b
                         br.ReadByte(), // a
                     };
+                    }
                 }
-            }
-            #endregion Read Raw Data
-            return raw;
+                #endregion Read Raw Data
+                return raw;
+            });
         }
 
-        public void InputTap(int x,int y) {
-            this.Shell($"input tap {x} {y}");
+        public byte[] InputTap(int x, int y) {
+            return this.Shell($"input tap {x} {y}");
         }
 
-        public TcpSocket Shell(string s) {
-            TcpSocket ts = this.CreateSocket();
+        public byte[] Shell(string s) {
+            using TcpSocket ts = this.CreateSocket();
             ts.Send($"shell:{s}");
-            return ts;
+            return ts.ReceiveAll();
         }
 
-        private void Transport(TcpSocket ts) {
-            ts.Send($"host:transport:{this.Serial}");
+        public T Shell<T>(string s, Func<TcpSocket, T> handler) {
+            using TcpSocket ts = this.c.CreateSocket();
+            ts.Send($"shell:{s}");
+            return handler(ts);
         }
 
         private TcpSocket CreateSocket(bool transport = true) {
             TcpSocket ts = this.c.CreateSocket();
             if(transport) {
-                this.Transport(ts);
+                ts.Send($"host:transport:{this.Serial}");
             }
             return ts;
         }
