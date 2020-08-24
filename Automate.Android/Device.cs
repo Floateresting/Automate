@@ -23,6 +23,8 @@ namespace Automate.Android {
             using NetworkStream ns = new NetworkStream(ts.Socket);
             using BinaryReader br = new BinaryReader(ns);
 
+            #region Read Raw Data
+
             // width, height, pixel format
             int w = br.ReadInt32();
             int h = br.ReadInt32();
@@ -41,7 +43,12 @@ namespace Automate.Android {
                     };
                 }
             }
+            #endregion Read Raw Data
             return raw;
+        }
+
+        public void InputTap(int x,int y) {
+            this.Shell($"input tap {x} {y}");
         }
 
         public TcpSocket Shell(string s) {
