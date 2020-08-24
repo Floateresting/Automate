@@ -33,15 +33,43 @@ foreach(Point p in heystack.LocateColorAll(new byte[] { 22, 22, 22 }, new Size(1
 
 ### Examples
 ~~~cs
-// Get screenshot from adb
 Client client = new Client();
 Device d = client.Devices.First();
 byte[,][] screenshot = d.Screencap();
+// Convert raw data from Screencap() to Bitmap object
 Bitmap b = screenshot.ToBitmap();
 b.Save("screen.bmp");
 ~~~
 
+# Automate.Android
+- Uses Android Debug Brige (adb)
 
+## Automate.Android.Client
+- Get a list of connected devices
+
+### Examples
+~~~cs
+// Connects to the server 127.0.0.1:5057 by default
+Client client = new Client();
+// Get a list of connected devices
+Device d = client.Devices();
+
+Console.WriteLine(d.First().Serial);
+~~~
+
+
+## Automate.Android.Device
+- Take screenshot
+
+### Examples
+~~~cs
+Client client = new Client();
+Device d = client.Devices.First();
+// Take screenshot from device
+byte[,][] screenshot = d.Screencap();
+// Get {r, g, b, a} values at x=10, y=20
+byte[] rgba = byte[10,20];
+~~~
 
 # Automate.Windows
 
