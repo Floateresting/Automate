@@ -14,9 +14,10 @@ namespace Automate.Android {
         /// Gets the amount of data that has been received from the network and is available to be read.
         /// </summary>
         public int Available => this.Socket.Available;
-        #endregion Properties
 
         public Socket Socket { get; set; }
+        #endregion Properties
+
 
         public TcpSocket(string host, int port) {
             this.Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
