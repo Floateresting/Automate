@@ -60,6 +60,7 @@ Console.WriteLine(d.First().Serial);
 
 ## Automate.Android.Device
 - Take screenshot
+- Left click
 
 ### Examples
 ~~~cs
@@ -69,6 +70,8 @@ Device d = client.Devices.First();
 byte[,][] screenshot = d.Screencap();
 // Get {r, g, b, a} values at x=10, y=20
 byte[] rgba = byte[10,20];
+// Click at x=300, y=100
+d.InputTap(300,100);
 ~~~
 
 # Automate.Windows
