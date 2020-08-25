@@ -14,16 +14,33 @@ namespace Automate.Android {
 
         #region Get
 
+        /// <summary>
+        /// Send string, check status, receive and handle the reply
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="s"></param>
+        /// <param name="handler"></param>
+        /// <returns></returns>
         internal T Get<T>(string s, Func<NetworkStream, T> handler) {
             this.Send(s);
             return handler(new NetworkStream(this.socket));
         }
 
+        /// <summary>
+        /// Send string, check status, receive the reply as <see cref="byte[]"/>
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         internal byte[] GetBytes(string s) {
             this.Send(s);
             return this.ReceiveBytes();
         }
 
+        /// <summary>
+        /// Send string, check status, receive the reply as <see cref="string"/>
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         internal string GetString(string s) {
             this.Send(s);
             return this.ReceiveString();
@@ -32,6 +49,10 @@ namespace Automate.Android {
 
         #region Send
 
+        /// <summary>
+        /// Send string, check status without receiving
+        /// </summary>
+        /// <param name="s"></param>
         internal void Send(string s) {
             this.socket.Send(Protocol.Encode(s));
             this.EnsureSucess();
@@ -40,12 +61,21 @@ namespace Automate.Android {
 
         #region Receive
 
+        /// <summary>
+        /// Receive a specific number of bytes
+        /// </summary>
+        /// <param name="length"></param>
+        /// <returns></returns>
         private byte[] ReceiveBytes(int length) {
             byte[] buffer = new byte[length];
             this.socket.Receive(buffer);
             return buffer;
         }
 
+        /// <summary>
+        /// Receive all bytes until end of stream
+        /// </summary>
+        /// <returns></returns>
         private byte[] ReceiveBytes() {
             using NetworkStream ns = new NetworkStream(this.socket);
             int i;
@@ -56,10 +86,19 @@ namespace Automate.Android {
             return bs.ToArray();
         }
 
+        /// <summary>
+        /// Receive a string with a specific length
+        /// </summary>
+        /// <param name="length"></param>
+        /// <returns></returns>
         private string ReceiveString(int length) {
             return Protocol.Decode(this.ReceiveBytes(length));
         }
 
+        /// <summary>
+        /// Read 4 bytes as the length of the string and receive the string
+        /// </summary>
+        /// <returns></returns>
         private string ReceiveString() {
             // The first 4 bytes indicates the length of the following string
             int length = int.Parse(this.ReceiveString(4), NumberStyles.HexNumber);
@@ -67,6 +106,9 @@ namespace Automate.Android {
         }
         #endregion Receive
 
+        /// <summary>
+        /// Throw error if the reply does not start with 'OKAY'
+        /// </summary>
         private void EnsureSucess() {
             string status = this.ReceiveString(4);
             if(status != Protocol.OKAY) {

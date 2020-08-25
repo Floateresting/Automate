@@ -23,6 +23,11 @@ namespace Automate.Android {
                 .ToArray();
         }
 
+        /// <summary>
+        /// Create a new connection towards a device
+        /// </summary>
+        /// <param name="serial"></param>
+        /// <returns></returns>
         internal TcpSocket CreateConnection(string serial) {
             TcpSocket ts = new TcpSocket(this.Hostname, this.Port);
             // Redirect all commands to this device
