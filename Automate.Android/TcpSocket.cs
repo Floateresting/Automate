@@ -5,58 +5,49 @@ using System.Net.Sockets;
 
 namespace Automate.Android {
     public class TcpSocket : IDisposable {
-        #region Properties
-
-        /// <summary>
-        /// Gets a value that indicates whether a <see cref="System.Net.Sockets.Socket"/>is connected
-        /// </summary>
-        public bool Connected => this.Socket.Connected;
-        /// <summary>
-        /// Gets the amount of data that has been received from the network and is available to be read.
-        /// </summary>
-        public int Available => this.Socket.Available;
-
-        public Socket Socket { get; set; }
-        #endregion Properties
-
+        private readonly Socket socket;
 
         public TcpSocket(string host, int port) {
-            this.Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            this.Socket.Connect(host, port);
+            this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            this.socket.Connect(host, port);
         }
 
-        /// <summary>
-        /// Read the length(4 bytes) and a string
-        /// </summary>
-        /// <returns></returns>
-        internal string GetString() {
-            int length = int.Parse(this.ReceiveString(4), NumberStyles.HexNumber);
-            return this.ReceiveString(length);
+        #region Get
+
+        internal T Get<T>(string s, Func<NetworkStream, T> handler) {
+            this.Send(s);
+            return handler(new NetworkStream(this.socket));
         }
 
-        /// <summary>
-        /// Send a string to ADB and check status
-        /// </summary>
-        /// <param name="s"></param>
-        /// <returns></returns>
-        internal bool Send(string s) {
-            this.Socket.Send(Protocol.Encode(s));
-            return this.CheckStatus();
+        internal byte[] GetBytes(string s) {
+            this.Send(s);
+            return this.ReceiveBytes();
         }
 
-        /// <summary>
-        /// Read bytes from the socket
-        /// </summary>
-        /// <param name="length">Number of bytes to read</param>
-        /// <returns></returns>
-        internal byte[] Receive(int length) {
+        internal string GetString(string s) {
+            this.Send(s);
+            return this.ReceiveString();
+        }
+        #endregion Get
+
+        #region Send
+
+        internal void Send(string s) {
+            this.socket.Send(Protocol.Encode(s));
+            this.EnsureSucess();
+        }
+        #endregion Send
+
+        #region Receive
+
+        private byte[] ReceiveBytes(int length) {
             byte[] buffer = new byte[length];
-            this.Socket.Receive(buffer);
+            this.socket.Receive(buffer);
             return buffer;
         }
 
-        internal byte[] ReceiveAll() {
-            using NetworkStream ns = new NetworkStream(this.Socket);
+        private byte[] ReceiveBytes() {
+            using NetworkStream ns = new NetworkStream(this.socket);
             int i;
             List<byte> bs = new List<byte>();
             while((i = ns.ReadByte()) != -1) {
@@ -65,31 +56,26 @@ namespace Automate.Android {
             return bs.ToArray();
         }
 
-        /// <summary>
-        /// Read bytes from the socket and convert to string
-        /// </summary>
-        /// <param name="length">Number of bytes to read</param>
-        /// <returns></returns>
-        internal string ReceiveString(int length) {
-            return Protocol.Decode(this.Receive(length));
+        private string ReceiveString(int length) {
+            return Protocol.Decode(this.ReceiveBytes(length));
         }
 
-        /// <summary>
-        /// Read 4 bytes and check if it's <see cref="Protocol.OKAY"/>
-        /// </summary>
-        /// <returns></returns>
-        internal bool CheckStatus() {
+        private string ReceiveString() {
+            // The first 4 bytes indicates the length of the following string
+            int length = int.Parse(this.ReceiveString(4), NumberStyles.HexNumber);
+            return this.ReceiveString(length);
+        }
+        #endregion Receive
+
+        private void EnsureSucess() {
             string status = this.ReceiveString(4);
             if(status != Protocol.OKAY) {
                 throw new Exception("Not okay");
             }
-            return true;
         }
 
-
-
         public void Dispose() {
-            this.Socket.Dispose();
+            this.socket.Dispose();
         }
     }
 }

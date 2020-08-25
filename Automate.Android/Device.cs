@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Net.Sockets;
-using System.Threading;
 
 namespace Automate.Android {
     public class Device {
         public string Serial { get; set; }
-        private readonly Client c;
-        public Device(Client c, string serial) {
-            this.c = c;
+        private readonly Host host;
+        public Device(Host h, string serial) {
+            this.host = h;
             this.Serial = serial;
         }
 
@@ -21,8 +19,7 @@ namespace Automate.Android {
         /// <seealso href="https://android.googlesource.com/platform/frameworks/base/+/android-4.3_r2.3/cmds/screencap/screencap.cpp#191"/>
         /// <returns>byte[x,y][] of {r, g, b, a}</returns>
         public byte[,][] Screencap() {
-            return this.Shell("screencap", ts => {
-                using NetworkStream ns = new NetworkStream(ts.Socket);
+            return this.Shell("screencap", ns => {
                 using BinaryReader br = new BinaryReader(ns);
 
                 #region Read Raw Data
@@ -55,23 +52,13 @@ namespace Automate.Android {
         }
 
         public byte[] Shell(string s) {
-            using TcpSocket ts = this.CreateSocket();
-            ts.Send($"shell:{s}");
-            return ts.ReceiveAll();
+            using TcpSocket ts = this.host.CreateConnection(this.Serial);
+            return ts.GetBytes($"shell:{s}");
         }
 
-        public T Shell<T>(string s, Func<TcpSocket, T> handler) {
-            using TcpSocket ts = this.c.CreateSocket();
-            ts.Send($"shell:{s}");
-            return handler(ts);
-        }
-
-        private TcpSocket CreateSocket(bool transport = true) {
-            TcpSocket ts = this.c.CreateSocket();
-            if(transport) {
-                ts.Send($"host:transport:{this.Serial}");
-            }
-            return ts;
+        public T Shell<T>(string s, Func<NetworkStream, T> handler) {
+            using TcpSocket ts = this.host.CreateConnection(this.Serial);
+            return ts.Get($"shell:{s}", handler);
         }
     }
 }
