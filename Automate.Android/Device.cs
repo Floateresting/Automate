@@ -36,11 +36,11 @@ namespace Automate.Android {
                 for(int y = 0; y < h; y++) {
                     for(int x = 0; x < w; x++) {
                         raw[x, y] = new byte[] {
-                        br.ReadByte(), // r
-                        br.ReadByte(), // g
-                        br.ReadByte(), // b
-                        br.ReadByte(), // a
-                    };
+                            br.ReadByte(), // r
+                            br.ReadByte(), // g
+                            br.ReadByte(), // b
+                            br.ReadByte(), // a
+                        };
                     }
                 }
                 #endregion Read Raw Data
