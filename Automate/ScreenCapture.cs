@@ -111,6 +111,7 @@ namespace Automate {
                 }
             }
         }
+
         /// <summary>
         /// Create <see cref="ScreenCapture"/> object from <see cref="Stream"/>
         /// </summary>
@@ -138,6 +139,10 @@ namespace Automate {
                 }
             }
             return sc;
+        }
+
+        public static ScreenCapture FromFile(string filename) {
+            return ScreenCapture.FromStream(File.OpenRead(filename));
         }
         #endregion Read/Write
 
