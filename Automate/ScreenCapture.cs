@@ -41,9 +41,9 @@ namespace Automate {
         /// <param name="needle">Data to compare with</param>
         /// <param name="t">Tolerance squared</param>
         /// <returns></returns>
-        private bool MatchesWith(int x1, int y1, byte[,][] needle, int t) {
-            for(int x2 = 0; x2 < needle.GetLength(0); x2++) {
-                for(int y2 = 0; y2 < needle.GetLength(1); y2++) {
+        private bool MatchesWith(int x1, int y1, ScreenCapture needle, int t) {
+            for(int x2 = 0; x2 < needle.Width; x2++) {
+                for(int y2 = 0; y2 < needle.Height; y2++) {
                     if(!this.MatchesWith(x1 + x2, y1 + y2, needle[x2, y2], t)) {
                         return false;
                     }
@@ -75,15 +75,21 @@ namespace Automate {
 
         #region Locate
 
-        public Point LocateRaw(byte[,][] needle, int t) {
+        /// <summary>
+        /// Compare 2 <see cref="ScreenCapture"/>
+        /// </summary>
+        /// <param name="needle"></param>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        public Point LocateRaw(ScreenCapture needle, int t) {
             // tolerance squared
             t *= t;
             // h.GL(1) - n.GL(1) so the needle won't be outside of heystack ( same for GL(0) )
-            for(int y = 0; y < this.Height - needle.GetLength(1); y++) {
-                for(int x = 0; x < this.Width - needle.GetLength(0); x++) {
+            for(int y = 0; y < this.Height - needle.Height; y++) {
+                for(int x = 0; x < this.Width - needle.Width; x++) {
                     if(this.MatchesWith(x, y, needle, t)) {
                         // return middle point
-                        return new Point(x + needle.GetLength(0) / 2, y + needle.GetLength(1) / 2);
+                        return new Point(x + needle.Width / 2, y + needle.Height / 2);
                     }
                 }
             }
