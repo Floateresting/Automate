@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 
@@ -97,8 +98,9 @@ namespace Automate {
         }
         #endregion Locate
 
+        #region Read/Write
 
-        public void Save(string filename) {
+        public void SaveAs(string filename) {
             using BinaryWriter bw = new BinaryWriter(File.Create(filename));
             bw.Write(this.Width); // int
             bw.Write(this.Height); // int
@@ -109,6 +111,37 @@ namespace Automate {
                 }
             }
         }
+        /// <summary>
+        /// Create <see cref="ScreenCapture"/> object from <see cref="Stream"/>
+        /// </summary>
+        /// <seealso href="https://stackoverflow.com/a/32733228"/>
+        /// <seealso href="https://android.googlesource.com/platform/frameworks/base/+/android-4.3_r2.3/cmds/screencap/screencap.cpp#191"/>
+        /// <returns></returns>
+        public static ScreenCapture FromStream(Stream s) {
+            using BinaryReader br = new BinaryReader(s);
+            // width, height, format
+            int w = br.ReadInt32();
+            int h = br.ReadInt32();
+            int f = br.ReadInt32();
+
+            if(f != 1) throw new Exception("Not rgba 8888 format");
+
+            ScreenCapture sc = new ScreenCapture(w, h);
+            for(int y = 0; y < h; y++) {
+                for(int x = 0; x < h; x++) {
+                    sc[x, y] = new byte[] {
+                        br.ReadByte(), // r
+                        br.ReadByte(), // g
+                        br.ReadByte(), // b
+                        br.ReadByte(), // a
+                    };
+                }
+            }
+            return sc;
+        }
+        #endregion Read/Write
+
+        #region Bitmap Conversion
 
         /// <summary>
         /// Convert byte array to a <see cref="Bitmap"/> by not using <see cref="Bitmap.SetPixel(int, int, Color)"/>
@@ -165,5 +198,6 @@ namespace Automate {
             }
             return sc;
         }
+        #endregion Bitmap
     }
 }
