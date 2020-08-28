@@ -19,7 +19,7 @@ namespace Automate.Android {
         /// <seealso href="https://stackoverflow.com/a/32733228"/>
         /// <seealso href="https://android.googlesource.com/platform/frameworks/base/+/android-4.3_r2.3/cmds/screencap/screencap.cpp#191"/>
         /// <returns>byte[x,y][] of {r, g, b, a}</returns>
-        public byte[,][] Screencap() {
+        public ScreenCapture Screencap() {
             return this.Shell("screencap", ns => {
                 using BinaryReader br = new BinaryReader(ns);
 
@@ -31,11 +31,10 @@ namespace Automate.Android {
                 int f = br.ReadInt32();
 
                 if(f != 1) throw new Exception("This is not rgba_8888 format");
-
-                byte[,][] raw = new byte[w, h][];
+                ScreenCapture sc = new ScreenCapture(w,h);
                 for(int y = 0; y < h; y++) {
                     for(int x = 0; x < w; x++) {
-                        raw[x, y] = new byte[] {
+                        sc[x, y] = new byte[] {
                             br.ReadByte(), // r
                             br.ReadByte(), // g
                             br.ReadByte(), // b
@@ -44,7 +43,7 @@ namespace Automate.Android {
                     }
                 }
                 #endregion Read Raw Data
-                return raw;
+                return sc;
             });
         }
 
