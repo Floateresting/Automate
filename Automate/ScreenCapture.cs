@@ -130,7 +130,7 @@ namespace Automate {
 
         #region Read/Write
 
-        public void SaveAs(string filename) {
+        public void Save(string filename) {
             using BinaryWriter bw = new BinaryWriter(File.Create(filename));
             bw.Write(this.Width); // int
             bw.Write(this.Height); // int
