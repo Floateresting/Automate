@@ -169,6 +169,7 @@ namespace Automate {
         public static ScreenCapture FromFile(string filename) {
             return ScreenCapture.FromStream(File.OpenRead(filename));
         }
+
         #endregion Read/Write
 
         #region Bitmap Conversion
@@ -227,6 +228,11 @@ namespace Automate {
                 }
             }
             return sc;
+        }
+
+        public static ScreenCapture FromBitmap(string filename) {
+            using Bitmap b = new Bitmap(filename);
+            return ScreenCapture.FromBitmap(b);
         }
         #endregion Bitmap
     }
