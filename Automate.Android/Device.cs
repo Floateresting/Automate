@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Sockets;
 
 namespace Automate.Android {
@@ -19,6 +21,23 @@ namespace Automate.Android {
         /// <returns>byte[x,y][] of {r, g, b, a}</returns>
         public ScreenCapture Screencap() {
             return this.Shell("screencap", ns => ScreenCapture.FromStream(ns));
+        }
+
+        /// <summary>
+        /// Execute 'screencap -p' and create a png file
+        /// </summary>
+        /// <param name="pngpath"></param>
+        /// <returns></returns>
+        public bool Screencap(string pngpath) {
+            return this.Shell("screencap -p", ns => {
+                int b;
+                List<byte> bs = new List<byte>();
+                while((b = ns.ReadByte()) != -1) {
+                    bs.Add((byte)b);
+                }
+                File.WriteAllBytes(pngpath, bs.ToArray());
+                return true;
+            });
         }
 
         /// <summary>

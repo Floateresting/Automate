@@ -23,7 +23,8 @@ namespace Automate.Android {
         /// <returns></returns>
         internal T Get<T>(string s, Func<NetworkStream, T> handler) {
             this.Send(s);
-            return handler(new NetworkStream(this.socket));
+            using NetworkStream ns = new NetworkStream(this.socket);
+            return handler(ns);
         }
 
         /// <summary>
