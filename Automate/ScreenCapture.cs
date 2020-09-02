@@ -134,8 +134,8 @@ namespace Automate {
             bw.Write(this.Width); // int
             bw.Write(this.Height); // int
             bw.Write(1); // format: int (always rgba_8888)
-            for(int x = 0; x < this.Width; x++) {
-                for(int y = 0; y < this.Height; y++) {
+            for(int y = 0; y < this.Height; y++) {
+                for(int x = 0; x < this.Width; x++) {
                     bw.Write(this[x, y]);
                 }
             }
