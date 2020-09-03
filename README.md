@@ -1,10 +1,10 @@
 # Automate
 
-## Bitmap Extensions
-- Find a bitmap with tolerance (returns the first match)
-- Find a region of a solid color with tolerance (returns the first match)
-- Find a bitmap with tolerance (returns all matches)
-- Find a region of a solid color with tolerance (returns all matches)
+## ImageArray
+- Convert from `ImageArray` to `System.Drawing.Bitmap`
+- Convert from `System.Drawing.Bitmap` to `ImageArray`
+- Locate a small ImageArray(needle) inside a big ImageArray(heystack)
+- Locate all needles inside heystack
 
 ### Examples
 ~~~cs

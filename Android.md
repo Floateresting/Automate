@@ -18,16 +18,38 @@ Console.WriteLine(d.First().Serial);
 ## Automate.Android.Device
 - Take screenshot
 - Left click
+- Search for images
 
-### Examples
+### Take Screenshots
 ~~~cs
-Host host = new Host();
-Device d = host.Devices.First();
+Device d = new Host().Devices.First();
 // Take screenshot from device
-byte[,][] screenshot = d.Screencap();
-// Get {r, g, b, a} values at x=10, y=20
-byte[] rgba = byte[10,20];
-// Click at x=300, y=100
-d.InputTap(300,100);
+ImageArray ia = d.Screencap();
+// Take screenshot and save as png
+d.Screencap("screen.png")
+// Save as raw data
+ia.Save("screen.raw");
+// Save as bitmap
+ia.ToBitmap().Save("screen.bmp");
+// Load image from raw data
+ia = ImageArray.FromFile("screen.raw");
+// Load image from bitmap
+ia = ImageArray.FromBitmap("screen.bmp");
+// PNG works as well
+ia = ImageArray.FromBitmap("screen.png");
 ~~~
 
+### Search for Images
+~~~cs
+Device d = new Host().Devices.First();
+// Get heystack and needle
+ImageArray heystack = d.Screencap();
+ImageArray needle = ImageArray.FromFile("needle.raw");
+// Locate needle inside heystack with 100 tolerance
+Point p;
+if((p = heystack.Locate(needle, 100)) != Point.Empty){
+	// found
+}else{
+	// not found
+}
+~~~
