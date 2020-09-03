@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 
 namespace Automate {
-    public class ScreenCapture {
+    public class ImageArray {
         public byte[,][] Data { get; }
         public int Width => this.Data.GetLength(0);
         public int Height => this.Data.GetLength(1);
@@ -16,7 +16,7 @@ namespace Automate {
             set => this.Data[x, y] = value;
         }
 
-        public ScreenCapture(int w, int h) {
+        public ImageArray(int w, int h) {
             this.Data = new byte[w, h][];
         }
 
@@ -44,7 +44,7 @@ namespace Automate {
         /// <param name="needle">Data to compare with</param>
         /// <param name="t">Tolerance squared</param>
         /// <returns></returns>
-        private bool MatchesWith(int x1, int y1, ScreenCapture needle, int t) {
+        private bool MatchesWith(int x1, int y1, ImageArray needle, int t) {
             for(int x2 = 0; x2 < needle.Width; x2++) {
                 for(int y2 = 0; y2 < needle.Height; y2++) {
                     if(!this.MatchesWith(x1 + x2, y1 + y2, needle[x2, y2], t)) {
@@ -79,12 +79,12 @@ namespace Automate {
         #region Locate
 
         /// <summary>
-        /// Search for a <see cref="ScreenCapture"/> and return the first match
+        /// Search for a <see cref="ImageArray"/> and return the first match
         /// </summary>
         /// <param name="needle"></param>
         /// <param name="tolerance">Minimum distance between 2 colors</param>
         /// <returns></returns>
-        public Point Locate(ScreenCapture needle, int tolerance = 0) {
+        public Point Locate(ImageArray needle, int tolerance = 0) {
             // tolerance squared
             tolerance *= tolerance;
             // h.GL(1) - n.GL(1) so the needle won't be outside of heystack ( same for GL(0) )
@@ -100,13 +100,13 @@ namespace Automate {
         }
 
         /// <summary>
-        /// Search for a <see cref="ScreenCapture"/> and return all the results
+        /// Search for a <see cref="ImageArray"/> and return all the results
         /// </summary>
         /// <param name="needle"></param>
         /// <param name="tolerance">Maximum distance between 2 colors</param>
         /// <param name="distance">Minimun distance between 2 found areas</param>
         /// <returns></returns>
-        public IEnumerable<Point> LocateAll(ScreenCapture needle, int tolerance = 0, int distance = 0) {
+        public IEnumerable<Point> LocateAll(ImageArray needle, int tolerance = 0, int distance = 0) {
             tolerance *= tolerance;
             List<Rectangle> covered = new List<Rectangle>();
             for(int y1 = 0; y1 <= this.Height - needle.Height; y1++) {
@@ -142,12 +142,12 @@ namespace Automate {
         }
 
         /// <summary>
-        /// Create <see cref="ScreenCapture"/> object from <see cref="Stream"/>
+        /// Create <see cref="ImageArray"/> object from <see cref="Stream"/>
         /// </summary>
         /// <seealso href="https://stackoverflow.com/a/32733228"/>
         /// <seealso href="https://android.googlesource.com/platform/frameworks/base/+/android-4.3_r2.3/cmds/screencap/screencap.cpp#191"/>
         /// <returns></returns>
-        public static ScreenCapture FromStream(Stream s) {
+        public static ImageArray FromStream(Stream s) {
             using BinaryReader br = new BinaryReader(s);
             // width, height, format
             int w = br.ReadInt32();
@@ -156,7 +156,7 @@ namespace Automate {
 
             if(f != 1) throw new Exception("Not rgba 8888 format");
 
-            ScreenCapture sc = new ScreenCapture(w, h);
+            ImageArray sc = new ImageArray(w, h);
             for(int y = 0; y < h; y++) {
                 for(int x = 0; x < w; x++) {
                     // r, g, b, a
@@ -166,8 +166,8 @@ namespace Automate {
             return sc;
         }
 
-        public static ScreenCapture FromFile(string filename) {
-            return ScreenCapture.FromStream(File.OpenRead(filename));
+        public static ImageArray FromFile(string filename) {
+            return ImageArray.FromStream(File.OpenRead(filename));
         }
 
         #endregion Read/Write
@@ -202,8 +202,8 @@ namespace Automate {
             return b;
         }
 
-        public static ScreenCapture FromBitmap(Bitmap b) {
-            ScreenCapture sc = new ScreenCapture(b.Width, b.Height);
+        public static ImageArray FromBitmap(Bitmap b) {
+            ImageArray sc = new ImageArray(b.Width, b.Height);
             // Lock bitmap into memory
             BitmapData d = b.LockBits(
                 new Rectangle(0, 0, b.Width, b.Height),
@@ -230,9 +230,9 @@ namespace Automate {
             return sc;
         }
 
-        public static ScreenCapture FromBitmap(string filename) {
+        public static ImageArray FromBitmap(string filename) {
             using Bitmap b = new Bitmap(filename);
-            return ScreenCapture.FromBitmap(b);
+            return ImageArray.FromBitmap(b);
         }
         #endregion Bitmap
     }
