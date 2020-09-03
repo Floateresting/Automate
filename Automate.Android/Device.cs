@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
@@ -48,6 +49,15 @@ namespace Automate.Android {
         /// <returns></returns>
         public byte[] InputTap(int x, int y) {
             return this.Shell($"input tap {x} {y}");
+        }
+
+        /// <summary>
+        /// Execute 'input tap'
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        public byte[] InputTap(Point p) {
+            return this.InputTap(p.X, p.Y);
         }
 
         /// <summary>
