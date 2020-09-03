@@ -15,6 +15,29 @@ namespace Automate.Android {
             this.Serial = serial;
         }
 
+        #region Shell
+
+        /// <summary>
+        /// Execute a shell command without handling the reply
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public byte[] Shell(string s) {
+            using TcpSocket ts = this.host.CreateConnection(this.Serial);
+            return ts.GetBytes($"shell:{s}");
+        }
+
+        /// <summary>
+        /// Execute a shell command with handling the reply
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="s"></param>
+        /// <param name="handler"></param>
+        /// <returns></returns>
+        public T Shell<T>(string s, Func<NetworkStream, T> handler) {
+            using TcpSocket ts = this.host.CreateConnection(this.Serial);
+            return ts.Get($"shell:{s}", handler);
+        }
 
         /// <summary>
         /// Execute 'screencap' and return the RAW reply
@@ -59,27 +82,6 @@ namespace Automate.Android {
         public byte[] InputTap(Point p) {
             return this.InputTap(p.X, p.Y);
         }
-
-        /// <summary>
-        /// Execute a shell command without handling the reply
-        /// </summary>
-        /// <param name="s"></param>
-        /// <returns></returns>
-        public byte[] Shell(string s) {
-            using TcpSocket ts = this.host.CreateConnection(this.Serial);
-            return ts.GetBytes($"shell:{s}");
-        }
-
-        /// <summary>
-        /// Execute a shell command with handling the reply
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="s"></param>
-        /// <param name="handler"></param>
-        /// <returns></returns>
-        public T Shell<T>(string s, Func<NetworkStream, T> handler) {
-            using TcpSocket ts = this.host.CreateConnection(this.Serial);
-            return ts.Get($"shell:{s}", handler);
-        }
+        #endregion Shell
     }
 }
