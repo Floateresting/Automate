@@ -34,7 +34,7 @@ namespace Automate {
         /// <param name="height">Width of the solid color region</param>
         /// <param name="tolerance">Minimum distance between 2 colors</param>
         /// <returns></returns>
-        public static Point LocateColor(this ImageArray heystack, byte[] color, int width, int height, int tolerance) {
+        public static Point LocateColor(this ImageArray heystack, byte[] color, int width, int height, int tolerance = 0) {
             tolerance *= tolerance;
             for(int y1 = 0; y1 <= heystack.Height - height; y1++) {
                 for(int x1 = 0; x1 < heystack.Width - width; x1++) {
