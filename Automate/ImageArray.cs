@@ -44,7 +44,7 @@ namespace Automate {
         /// <param name="needle">Data to compare with</param>
         /// <param name="t">Tolerance squared</param>
         /// <returns></returns>
-        private bool MatchesWith(int x1, int y1, ImageArray needle, int t) {
+        internal bool MatchesWith(int x1, int y1, ImageArray needle, int t) {
             for(int x2 = 0; x2 < needle.Width; x2++) {
                 for(int y2 = 0; y2 < needle.Height; y2++) {
                     if(!this.MatchesWith(x1 + x2, y1 + y2, needle[x2, y2], t)) {
@@ -64,7 +64,7 @@ namespace Automate {
         /// <param name="size">Size of the solid color region</param>
         /// <param name="t">Tolerance squared</param>
         /// <returns></returns>
-        private bool MatchesWith(int x1, int y1, byte[] color, Size size, int t) {
+        internal bool MatchesWith(int x1, int y1, byte[] color, Size size, int t) {
             for(int x2 = 0; x2 < size.Width; x2++) {
                 for(int y2 = 0; y2 < size.Height; y2++) {
                     if(!this.MatchesWith(x1 + x2, y1 + y2, color, t)) {
@@ -75,57 +75,6 @@ namespace Automate {
             return true;
         }
         #endregion Match
-
-        #region Locate
-
-        /// <summary>
-        /// Search for a <see cref="ImageArray"/> and return the first match
-        /// </summary>
-        /// <param name="needle"></param>
-        /// <param name="tolerance">Minimum distance between 2 colors</param>
-        /// <returns></returns>
-        public Point Locate(ImageArray needle, int tolerance = 0) {
-            // tolerance squared
-            tolerance *= tolerance;
-            // h.GL(1) - n.GL(1) so the needle won't be outside of heystack ( same for GL(0) )
-            for(int y = 0; y <= this.Height - needle.Height; y++) {
-                for(int x = 0; x <= this.Width - needle.Width; x++) {
-                    if(this.MatchesWith(x, y, needle, tolerance)) {
-                        // return middle point
-                        return new Point(x + needle.Width / 2, y + needle.Height / 2);
-                    }
-                }
-            }
-            return Point.Empty;
-        }
-
-        /// <summary>
-        /// Search for a <see cref="ImageArray"/> and return all the results
-        /// </summary>
-        /// <param name="needle"></param>
-        /// <param name="tolerance">Maximum distance between 2 colors</param>
-        /// <param name="distance">Minimun distance between 2 found areas</param>
-        /// <returns></returns>
-        public IEnumerable<Point> LocateAll(ImageArray needle, int tolerance = 0, int distance = 0) {
-            tolerance *= tolerance;
-            List<Rectangle> covered = new List<Rectangle>();
-            for(int y1 = 0; y1 <= this.Height - needle.Height; y1++) {
-                for(int x1 = 0; x1 <= this.Width - needle.Width; x1++) {
-                    // Skip pixels that are in found areas
-                    if(covered.Select(rect => rect.Contains(x1, y1)).Any()) continue;
-                    // Add rect and return point if matches
-                    if(this.MatchesWith(x1, y1, needle, tolerance)) {
-                        // Add needle with minimum distance
-                        covered.Add(new Rectangle(x1 - distance, y1 - distance, needle.Width + distance, needle.Height + distance));
-
-                        yield return new Point(x1 + needle.Width / 2, y1 + needle.Height / 2);
-                        // continue outside the needle
-                        x1 += needle.Width;
-                    }
-                }
-            }
-        }
-        #endregion Locate
 
         #region Read/Write
 
