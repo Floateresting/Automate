@@ -27,11 +27,11 @@ namespace Automate {
         /// </summary>
         /// <param name="t">tolerance squared</param>
         /// <returns></returns>
-        private bool MatchesWith(int x, int y, byte[] pixel, int t) {
+        private bool MatchesWith(int x, int y, byte[] color, int t) {
             int actual = 0;
             // Transparent pixels: not implemented
             for(int i = 0; i < 3; i++) {
-                actual += (this[x, y][i] - pixel[i]) * (this[x, y][i] - pixel[i]);
+                actual += (this[x, y][i] - color[i]) * (this[x, y][i] - color[i]);
             }
             return actual <= t;
         }
@@ -58,15 +58,16 @@ namespace Automate {
         /// <summary>
         /// Indicates whether part of the region is a solid color
         /// </summary>
-        /// <param name="x">Start x position</param>
-        /// <param name="y">Start y position</param>
+        /// <param name="x1">Start x position</param>
+        /// <param name="y1">Start y position</param>
         /// <param name="color">{r, g, b}</param>
-        /// <param name="size">Size of the solid color region</param>
+        /// <param name="w">Width of the solid color region</param>
+        /// <param name="h">Height of the solid color region</param>
         /// <param name="t">Tolerance squared</param>
         /// <returns></returns>
-        internal bool MatchesWith(int x1, int y1, byte[] color, Size size, int t) {
-            for(int x2 = 0; x2 < size.Width; x2++) {
-                for(int y2 = 0; y2 < size.Height; y2++) {
+        internal bool MatchesWith(int x1, int y1, byte[] color, int w, int h, int t) {
+            for(int x2 = 0; x2 < w; x2++) {
+                for(int y2 = 0; y2 < h; y2++) {
                     if(!this.MatchesWith(x1 + x2, y1 + y2, color, t)) {
                         return false;
                     }

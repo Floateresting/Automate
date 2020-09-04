@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Security.Cryptography;
 
 namespace Automate {
     public static class ImageArrayExtensions {
@@ -13,11 +14,32 @@ namespace Automate {
             // tolerance squared
             tolerance *= tolerance;
             // h.GL(1) - n.GL(1) so the needle won't be outside of heystack ( same for GL(0) )
-            for(int y = 0; y <= heystack.Height - needle.Height; y++) {
-                for(int x = 0; x <= heystack.Width - needle.Width; x++) {
-                    if(heystack.MatchesWith(x, y, needle, tolerance)) {
+            for(int y1 = 0; y1 <= heystack.Height - needle.Height; y1++) {
+                for(int x1 = 0; x1 <= heystack.Width - needle.Width; x1++) {
+                    if(heystack.MatchesWith(x1, y1, needle, tolerance)) {
                         // return middle point
-                        return new Point(x + needle.Width / 2, y + needle.Height / 2);
+                        return new Point(x1 + needle.Width / 2, y1 + needle.Height / 2);
+                    }
+                }
+            }
+            return Point.Empty;
+        }
+
+        /// <summary>
+        /// Search for a solid color and return the first match
+        /// </summary>
+        /// <param name="heystack"></param>
+        /// <param name="color"></param>
+        /// <param name="width">Width of the solid color region</param>
+        /// <param name="height">Width of the solid color region</param>
+        /// <param name="tolerance">Minimum distance between 2 colors</param>
+        /// <returns></returns>
+        public static Point LocateColor(this ImageArray heystack, byte[] color, int width, int height, int tolerance) {
+            tolerance *= tolerance;
+            for(int y1 = 0; y1 <= heystack.Height - height; y1++) {
+                for(int x1 = 0; x1 < heystack.Width - width; x1++) {
+                    if(heystack.MatchesWith(x1, y1, color, width, height, tolerance)) {
+                        return new Point(x1 + width / 2, y1 + height / 2);
                     }
                 }
             }
