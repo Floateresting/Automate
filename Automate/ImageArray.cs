@@ -26,15 +26,15 @@ namespace Automate {
         /// Indicates whether the difference between two colors are tolerable
         /// </summary>
         /// <param name="rgba">{r, g, b, a}</param>
-        /// <param name="t">tolerance squared</param>
+        /// <param name="t2">tolerance squared</param>
         /// <returns></returns>
-        private bool MatchesWith(int x, int y, byte[] rgba, int t) {
+        private bool MatchesWith(int x, int y, byte[] rgba, int t2) {
             int actual = 0;
             // Transparent pixels: not implemented
             for(int i = 0; i < 3; i++) {
                 actual += (this[x, y][i] - rgba[i]) * (this[x, y][i] - rgba[i]);
             }
-            return actual <= t;
+            return actual <= t2;
         }
 
         /// <summary>
@@ -43,12 +43,12 @@ namespace Automate {
         /// <param name="x1">Start x position</param>
         /// <param name="y1">Start y position</param>
         /// <param name="needle">Data to compare with</param>
-        /// <param name="t">Tolerance squared</param>
+        /// <param name="t2">Tolerance squared</param>
         /// <returns></returns>
-        internal bool MatchesWith(int x1, int y1, ImageArray needle, int t) {
+        internal bool MatchesWith(int x1, int y1, ImageArray needle, int t2) {
             for(int x2 = 0; x2 < needle.Width; x2++) {
                 for(int y2 = 0; y2 < needle.Height; y2++) {
-                    if(!this.MatchesWith(x1 + x2, y1 + y2, needle[x2, y2], t)) {
+                    if(!this.MatchesWith(x1 + x2, y1 + y2, needle[x2, y2], t2)) {
                         return false;
                     }
                 }
@@ -64,12 +64,12 @@ namespace Automate {
         /// <param name="rgba">{r, g, b, a}</param>
         /// <param name="w">Width of the solid color region</param>
         /// <param name="h">Height of the solid color region</param>
-        /// <param name="t">Tolerance squared</param>
+        /// <param name="t2">Tolerance squared</param>
         /// <returns></returns>
-        internal bool MatchesWith(int x1, int y1, byte[] rgba, int w, int h, int t) {
+        internal bool MatchesWith(int x1, int y1, byte[] rgba, int w, int h, int t2) {
             for(int x2 = 0; x2 < w; x2++) {
                 for(int y2 = 0; y2 < h; y2++) {
-                    if(!this.MatchesWith(x1 + x2, y1 + y2, rgba, t)) {
+                    if(!this.MatchesWith(x1 + x2, y1 + y2, rgba, t2)) {
                         return false;
                     }
                 }
