@@ -25,13 +25,14 @@ namespace Automate {
         /// <summary>
         /// Indicates whether the difference between two colors are tolerable
         /// </summary>
+        /// <param name="rgba">{r, g, b, a}</param>
         /// <param name="t">tolerance squared</param>
         /// <returns></returns>
-        private bool MatchesWith(int x, int y, byte[] color, int t) {
+        private bool MatchesWith(int x, int y, byte[] rgba, int t) {
             int actual = 0;
             // Transparent pixels: not implemented
             for(int i = 0; i < 3; i++) {
-                actual += (this[x, y][i] - color[i]) * (this[x, y][i] - color[i]);
+                actual += (this[x, y][i] - rgba[i]) * (this[x, y][i] - rgba[i]);
             }
             return actual <= t;
         }
@@ -60,15 +61,15 @@ namespace Automate {
         /// </summary>
         /// <param name="x1">Start x position</param>
         /// <param name="y1">Start y position</param>
-        /// <param name="color">{r, g, b}</param>
+        /// <param name="rgba">{r, g, b, a}</param>
         /// <param name="w">Width of the solid color region</param>
         /// <param name="h">Height of the solid color region</param>
         /// <param name="t">Tolerance squared</param>
         /// <returns></returns>
-        internal bool MatchesWith(int x1, int y1, byte[] color, int w, int h, int t) {
+        internal bool MatchesWith(int x1, int y1, byte[] rgba, int w, int h, int t) {
             for(int x2 = 0; x2 < w; x2++) {
                 for(int y2 = 0; y2 < h; y2++) {
-                    if(!this.MatchesWith(x1 + x2, y1 + y2, color, t)) {
+                    if(!this.MatchesWith(x1 + x2, y1 + y2, rgba, t)) {
                         return false;
                     }
                 }
