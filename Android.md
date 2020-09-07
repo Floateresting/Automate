@@ -47,9 +47,9 @@ ImageArray heystack = d.Screencap();
 ImageArray needle = ImageArray.FromFile("needle.raw");
 // Locate needle inside heystack with 100 tolerance
 Point p;
-if((p = heystack.Locate(needle, 100)) != Point.Empty){
-	// found
-}else{
+if((p = heystack.Locate(needle, 100)).IsEmpty){
 	// not found
+}else{
+	// found
 }
 ~~~
