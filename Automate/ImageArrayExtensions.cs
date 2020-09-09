@@ -5,6 +5,20 @@ using System.Linq;
 namespace Automate {
     public static class ImageArrayExtensions {
         /// <summary>
+        /// Convert a hex color to <see cref="byte[]"/>
+        /// 0x39c5bbff to { 0x39, 0xc5, 0xbb, 0xff }
+        /// </summary>
+        /// <param name="hex"></param>
+        /// <returns></returns>
+        public static byte[] ToRGBA(int hex) {
+            byte[] rgba = new byte[4];
+            for(int i = rgba.Length; i-- > 0; hex >>= 8) {
+                rgba[i] = (byte)(hex & 0xff);
+            }
+            return rgba;
+        }
+
+        /// <summary>
         /// Search for a <see cref="ImageArray"/> and return the first match
         /// </summary>
         /// <param name="tolerance">Minimum distance between 2 colors</param>
@@ -28,16 +42,16 @@ namespace Automate {
         /// Search for a solid color and return the first match
         /// </summary>
         /// <param name="heystack"></param>
-        /// <param name="rgba">{r, g, b, a}</param>
+        /// <param name="rgba">0xrrggbbaa</param>
         /// <param name="width">Width of the solid color region</param>
         /// <param name="height">Width of the solid color region</param>
         /// <param name="tolerance">Minimum distance between 2 colors</param>
         /// <returns></returns>
-        public static Point LocateColor(this ImageArray heystack, byte[] rgba, int width, int height, int tolerance = 0) {
+        public static Point LocateColor(this ImageArray heystack, int rgba, int width, int height, int tolerance = 0) {
             tolerance *= tolerance;
             for(int y1 = 0; y1 <= heystack.Height - height; y1++) {
                 for(int x1 = 0; x1 < heystack.Width - width; x1++) {
-                    if(heystack.MatchesWith(x1, y1, rgba, width, height, tolerance)) {
+                    if(heystack.MatchesWith(x1, y1, ToRGBA(rgba), width, height, tolerance)) {
                         return new Point(x1 + width / 2, y1 + height / 2);
                     }
                 }
@@ -80,20 +94,20 @@ namespace Automate {
         /// Seach for a color and return all the results
         /// </summary>
         /// <param name="heystack"></param>
-        /// <param name="rgba">{r, g, b, a}</param>
+        /// <param name="rgba">0xrrggbbaa</param>
         /// <param name="width">Width of the solid color region</param>
         /// <param name="height">Width of the solid color region</param>
         /// <param name="tolerance">Minimum distance between 2 colors</param>
         /// <param name="distance">Minimun distance between 2 found areas</param>
         /// <returns></returns>
-        public static IEnumerable<Point> LocateColorAll(this ImageArray heystack, byte[] rgba, int width, int height, int tolerance = 0, int distance = 0) {
+        public static IEnumerable<Point> LocateColorAll(this ImageArray heystack, int rgba, int width, int height, int tolerance = 0, int distance = 0) {
             tolerance *= tolerance;
             List<Rectangle> coverd = new List<Rectangle>();
             for(int y1 = 0; y1 < heystack.Height - height; y1++) {
                 for(int x1 = 0; x1 < heystack.Width - width; x1++) {
                     if(coverd.Select(rect => rect.Contains(x1, y1)).Any()) continue;
 
-                    if(heystack.MatchesWith(x1, y1, rgba, width, height, tolerance)) {
+                    if(heystack.MatchesWith(x1, y1, ToRGBA(rgba), width, height, tolerance)) {
                         coverd.Add(new Rectangle(
                             x1 - distance,
                             y1 - distance,
