@@ -39,28 +39,6 @@ namespace Automate {
         }
 
         /// <summary>
-        /// Search for a solid color and return the first match
-        /// </summary>
-        /// <param name="heystack"></param>
-        /// <param name="hex">0xrrggbbaa</param>
-        /// <param name="width">Width of the solid color region</param>
-        /// <param name="height">Width of the solid color region</param>
-        /// <param name="tolerance">Minimum distance between 2 colors</param>
-        /// <returns></returns>
-        public static Point LocateColor(this ImageArray heystack, int hex, int width, int height, int tolerance = 0) {
-            tolerance *= tolerance;
-            byte[] rgb = hex.ToRGB();
-            for(int y1 = 0; y1 <= heystack.Height - height; y1++) {
-                for(int x1 = 0; x1 < heystack.Width - width; x1++) {
-                    if(heystack.MatchesWith(x1, y1, rgb, width, height, tolerance)) {
-                        return new Point(x1 + width / 2, y1 + height / 2);
-                    }
-                }
-            }
-            return Point.Empty;
-        }
-
-        /// <summary>
         /// Search for a <see cref="ImageArray"/> and return all the results
         /// </summary>
         /// <param name="tolerance">Maximum distance between 2 colors</param>
@@ -92,10 +70,32 @@ namespace Automate {
         }
 
         /// <summary>
+        /// Search for a solid color and return the first match
+        /// </summary>
+        /// <param name="heystack"></param>
+        /// <param name="hex">0xrrggbb</param>
+        /// <param name="width">Width of the solid color region</param>
+        /// <param name="height">Width of the solid color region</param>
+        /// <param name="tolerance">Minimum distance between 2 colors</param>
+        /// <returns></returns>
+        public static Point LocateColor(this ImageArray heystack, int hex, int width, int height, int tolerance = 0) {
+            tolerance *= tolerance;
+            byte[] rgb = hex.ToRGB();
+            for(int y1 = 0; y1 <= heystack.Height - height; y1++) {
+                for(int x1 = 0; x1 < heystack.Width - width; x1++) {
+                    if(heystack.MatchesWith(x1, y1, rgb, width, height, tolerance)) {
+                        return new Point(x1 + width / 2, y1 + height / 2);
+                    }
+                }
+            }
+            return Point.Empty;
+        }
+       
+        /// <summary>
         /// Seach for a color and return all the results
         /// </summary>
         /// <param name="heystack"></param>
-        /// <param name="hex">0xrrggbbaa</param>
+        /// <param name="hex">0xrrggbb</param>
         /// <param name="width">Width of the solid color region</param>
         /// <param name="height">Width of the solid color region</param>
         /// <param name="tolerance">Minimum distance between 2 colors</param>
