@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 
@@ -13,7 +14,7 @@ namespace Automate {
         public static Point Locate(this ImageArray heystack, ImageArray needle, int tolerance = 0) {
             // tolerance squared
             tolerance *= tolerance;
-            // h.GL(1) - n.GL(1) so the needle won't be outside of heystack ( same for GL(0) )
+            // h.Width - n.Width so the needle won't be outside of heystack ( same for GL(0) )
             for(int y1 = 0; y1 <= heystack.Height - needle.Height; y1++) {
                 for(int x1 = 0; x1 <= heystack.Width - needle.Width; x1++) {
                     if(heystack.MatchesWith(x1, y1, needle, tolerance)) {
@@ -57,8 +58,9 @@ namespace Automate {
         }
 
         public static Point LocateTemplate(this ImageArray h, Template t) {
-            for(int y1 = t.Y; y1 <= h.Height - t.Height; y1++) {
-                for(int x1 = t.X; x1 <= h.Width - t.Width; x1++) {
+            for(int y1 = t.Y; y1 <= t.X + t.Height; y1++) {
+                for(int x1 = t.X; x1 <= t.Y + t.Width; x1++) {
+                    if(x1 == 300 && y1 == 472) Debugger.Break();
                     if(h.MatchesWith(x1, y1, t.Color, t.Size, t.Size, t.Tolerance2)) {
                         int offset = t.Size / 2;
                         return new Point(x1 + offset, y1 + offset);
