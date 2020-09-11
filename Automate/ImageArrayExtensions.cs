@@ -62,8 +62,8 @@ namespace Automate {
         /// <param name="t"></param>
         /// <returns></returns>
         public static Point LocateTemplate(this ImageArray heystack, Template t) {
-            for(int x1 = t.X; x1 <= t.Y + t.Width; x1++) {
-                for(int y1 = t.Y; y1 <= t.X + t.Height; y1++) {
+            for(int x1 = t.X; x1 <= t.X + t.Width; x1++) {
+                for(int y1 = t.Y; y1 <= t.Y + t.Height; y1++) {
                     if(heystack.MatchesWith(x1, y1, t.Color, t.Size, t.Size, t.Tolerance2)) {
                         int offset = t.Size / 2;
                         return new Point(x1 + offset, y1 + offset);
