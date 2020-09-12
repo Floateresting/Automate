@@ -7,6 +7,7 @@
         public int Width { get; set; }
         public int Height { get; set; }
         public int Tolerance2 { get; }
+        public int Distance { get; set; }
 
         /// <summary>
         /// Initialize a template
@@ -15,7 +16,8 @@
         /// <param name="size">Minimum size of the color (will be searching for a square)</param>
         /// <param name="region">Expected region (for faster template matching)</param>
         /// <param name="tolerance">Maximum distance with the color</param>
-        public Template(int hex, int size, (int X, int Y, int Width, int Height) region, int tolerance) {
+        /// <param name="distance">Minimun distance between 2 found regions</param>
+        public Template(int hex, int size, (int X, int Y, int Width, int Height) region, int tolerance, int distance = 0) {
             this.Color = Template.ToRGB(hex);
             this.Size = size;
             this.X = region.X;
@@ -23,6 +25,7 @@
             this.Width = region.Width;
             this.Height = region.Height;
             this.Tolerance2 = tolerance * tolerance;
+            this.Distance = distance;
         }
 
         /// <summary>
