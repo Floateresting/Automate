@@ -1,9 +1,9 @@
 # Automate
 
-## ImageArray
-- Convert from `ImageArray` to `System.Drawing.Bitmap`
-- Convert from `System.Drawing.Bitmap` to `ImageArray`
-- Locate a small ImageArray(needle) inside a big ImageArray(heystack)
+## ScreenCaputre
+- Convert from `ScreenCaputre` to `System.Drawing.Bitmap`
+- Convert from `System.Drawing.Bitmap` to `ScreenCaputre`
+- Locate a small ScreenCaputre(needle) inside a big ScreenCaputre(heystack)
 - Locate all needles inside heystack
 
 ### Examples
@@ -11,13 +11,13 @@
 ~~~cs
 Device d = new Host().Devices.First();
 // Get heystack and needle
-ImageArray heystack = d.Screencap();
+ScreenCaputre heystack = d.Screencap();
 // Save heystack image
 heystack.ToBitmap().Save("heystack.bmp");
 heystack.Save("heystack.raw");
 // Load needle image
-ImageArray needle = ImageArray.FromFile("needle.raw");
-needle = ImageArray.FromBitmap("needle.bmp");
+ScreenCaputre needle = ScreenCaputre.FromFile("needle.raw");
+needle = ScreenCaputre.FromBitmap("needle.bmp");
 // Locate needle inside heystack with 100 tolerance
 Point p0 = heystack.Locate(needle, 100);
 if(p0.IsEmpty){
