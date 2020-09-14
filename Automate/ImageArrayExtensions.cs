@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 
@@ -44,8 +43,8 @@ namespace Automate {
                         covered.Add(new Rectangle(
                             x1 - distance,
                             y1 - distance,
-                            needle.Width + distance,
-                            needle.Height + distance
+                            needle.Width + distance * 2,
+                            needle.Height + distance * 2
                         ));
 
                         yield return new Point(x1 + needle.Width / 2, y1 + needle.Height / 2);
@@ -79,13 +78,13 @@ namespace Automate {
             int offset = t.Size / 2;
             for(int x1 = t.X; x1 <= t.X + t.Width; x1++) {
                 for(int y1 = t.Y; y1 <= t.Y + t.Height; y1++) {
-                    if(covered.Select(rect => rect.Contains(x1, y1)).Any()) continue;
+                    if(covered.Where(rect => rect.Contains(x1, y1)).Any()) continue;
                     if(h.MatchesWith(x1, y1, t.Color, t.Size, t.Size, t.Tolerance2)) {
                         covered.Add(new Rectangle(
                             x1 - t.Distance,
                             y1 - t.Distance,
-                            t.Size + t.Distance,
-                            t.Size + t.Distance
+                            t.Size + t.Distance * 2,
+                            t.Size + t.Distance * 2
                         ));
                         yield return new Point(x1 + offset, y1 + offset);
                         x1 += t.Size;
