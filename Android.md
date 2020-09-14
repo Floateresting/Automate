@@ -24,19 +24,19 @@ Console.WriteLine(d.First().Serial);
 ~~~cs
 Device d = new Host().Devices.First();
 // Take screenshot from device
-ImageArray ia = d.Screencap();
-// Take screenshot and save as png
+ScreenCapture sc = d.Screencap();
+// Take screenshot from device and save as png
 d.Screencap("screen.png")
 // Save as raw data
-ia.Save("screen.raw");
+sc.Save("screen.raw");
 // Save as bitmap
-ia.ToBitmap().Save("screen.bmp");
+sc.ToBitmap().Save("screen.bmp");
 // Load image from raw data
-ia = ImageArray.FromFile("screen.raw");
+sc = ScreenCapture.FromFile("screen.raw");
 // Load image from bitmap
-ia = ImageArray.FromBitmap("screen.bmp");
+sc = ScreenCapture.FromBitmap("screen.bmp");
 // PNG works as well
-ia = ImageArray.FromBitmap("screen.png");
+sc = ScreenCapture.FromBitmap("screen.png");
 ~~~
 
 ### Search for Images
