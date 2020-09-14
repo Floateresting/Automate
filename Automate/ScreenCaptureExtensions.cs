@@ -3,13 +3,13 @@ using System.Drawing;
 using System.Linq;
 
 namespace Automate {
-    public static class ImageArrayExtensions {
+    public static class ScreenCaptureExtensions {
         /// <summary>
-        /// Search for a <see cref="ImageArray"/> and return the first match
+        /// Search for a <see cref="ScreenCapture"/> and return the first match
         /// </summary>
         /// <param name="tolerance">Minimum distance between 2 colors</param>
         /// <returns></returns>
-        public static Point Locate(this ImageArray heystack, ImageArray needle, int tolerance = 0) {
+        public static Point Locate(this ScreenCapture heystack, ScreenCapture needle, int tolerance = 0) {
             // tolerance squared
             tolerance *= tolerance;
             // h.Width - n.Width so the needle won't be outside of heystack ( same for GL(0) )
@@ -25,12 +25,12 @@ namespace Automate {
         }
 
         /// <summary>
-        /// Search for a <see cref="ImageArray"/> and return all the results
+        /// Search for a <see cref="ScreenCapture"/> and return all the results
         /// </summary>
         /// <param name="tolerance">Maximum distance between 2 colors</param>
         /// <param name="distance">Minimun distance between 2 found areas</param>
         /// <returns></returns>
-        public static IEnumerable<Point> LocateAll(this ImageArray heystack, ImageArray needle, int tolerance = 0, int distance = 0) {
+        public static IEnumerable<Point> LocateAll(this ScreenCapture heystack, ScreenCapture needle, int tolerance = 0, int distance = 0) {
             tolerance *= tolerance;
             List<Rectangle> covered = new List<Rectangle>();
             for(int x1 = 0; x1 <= heystack.Width - needle.Width; x1++) {
@@ -61,7 +61,7 @@ namespace Automate {
         /// <param name="heystack"></param>
         /// <param name="t"></param>
         /// <returns></returns>
-        public static Point LocateTemplate(this ImageArray heystack, Template t) {
+        public static Point LocateTemplate(this ScreenCapture heystack, Template t) {
             for(int x1 = t.X; x1 <= t.X + t.Width; x1++) {
                 for(int y1 = t.Y; y1 <= t.Y + t.Height; y1++) {
                     if(heystack.MatchesWith(x1, y1, t.Color, t.Size, t.Size, t.Tolerance2)) {
@@ -73,7 +73,7 @@ namespace Automate {
             return Point.Empty;
         }
 
-        public static IEnumerable<Point> LocateTemplateAll(this ImageArray h, Template t) {
+        public static IEnumerable<Point> LocateTemplateAll(this ScreenCapture h, Template t) {
             List<Rectangle> covered = new List<Rectangle>();
             int offset = t.Size / 2;
             for(int x1 = t.X; x1 <= t.X + t.Width; x1++) {

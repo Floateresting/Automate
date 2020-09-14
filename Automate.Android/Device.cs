@@ -43,8 +43,8 @@ namespace Automate.Android {
         /// Execute 'screencap' and return the RAW reply
         /// </summary>
         /// <returns>byte[x,y][] of {r, g, b, a}</returns>
-        public ImageArray Screencap() {
-            return this.Shell("screencap", ns => ImageArray.FromStream(ns));
+        public ScreenCapture Screencap() {
+            return this.Shell("screencap", ns => ScreenCapture.FromStream(ns));
         }
 
         /// <summary>
