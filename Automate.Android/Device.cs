@@ -64,23 +64,38 @@ namespace Automate.Android {
             });
         }
 
-        /// <summary>
-        /// Execute 'input tap'
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
         public byte[] InputTap(int x, int y) {
             return this.Shell($"input tap {x} {y}");
         }
 
-        /// <summary>
-        /// Execute 'input tap'
-        /// </summary>
-        /// <param name="p"></param>
-        /// <returns></returns>
         public byte[] InputTap(Point p) {
             return this.InputTap(p.X, p.Y);
+        }
+
+        /// <summary>
+        /// Swipe from (x1, y1) to (x2, y2) in {duration} ms
+        /// </summary>
+        /// <param name="x1"></param>
+        /// <param name="y1"></param>
+        /// <param name="x2"></param>
+        /// <param name="y2"></param>
+        /// <param name="duration">Milliseconds</param>
+        /// <returns></returns>
+        public byte[] InputSwipe(int x1, int y1, int x2, int y2, int? duration = null) {
+            return this.Shell($"input swipe {x1} {y1} {x2} {y2} {duration}");
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="x1"></param>
+        /// <param name="y1"></param>
+        /// <param name="x2"></param>
+        /// <param name="y2"></param>
+        /// <param name="duration">Milliseconds</param>
+        /// <returns></returns>
+        public byte[] InputSwipe(Point from, Point to, int? duration = null) {
+            return this.InputSwipe(from.X, from.Y, to.X, to.Y, duration);
         }
         #endregion Shell
     }
