@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
 
 namespace Automate {
     public class ScreenCapture {
@@ -80,7 +78,7 @@ namespace Automate {
 
         #region Read/Write
 
-        public void Save(string filename) {
+        public ScreenCapture Save(string filename) {
             using BinaryWriter bw = new BinaryWriter(File.Create(filename));
             bw.Write(this.Width); // int
             bw.Write(this.Height); // int
@@ -90,6 +88,12 @@ namespace Automate {
                     bw.Write(this[x, y]);
                 }
             }
+            return this;
+        }
+
+        public ScreenCapture SaveAsBitmap(string filename, ImageFormat format) {
+            this.ToBitmap().Save(filename, format);
+            return this;
         }
 
         /// <summary>
