@@ -103,19 +103,23 @@ namespace Automate {
         /// <seealso href="https://android.googlesource.com/platform/frameworks/base/+/android-4.3_r2.3/cmds/screencap/screencap.cpp#191"/>
         /// <returns></returns>
         public static ScreenCapture FromStream(Stream s) {
-            using BinaryReader br = new BinaryReader(s);
-            // width, height, format
-            int w = br.ReadInt32();
-            int h = br.ReadInt32();
-            int f = br.ReadInt32();
+            using MemoryStream ms = new MemoryStream();
+            s.CopyTo(ms);
+            byte[] a = ms.ToArray();
+            int i = -4;
+            int w = BitConverter.ToInt32(a, i += 4);
+            int h = BitConverter.ToInt32(a, i += 4);
+            int f = BitConverter.ToInt32(a, i += 4);
 
             if(f != 1) throw new Exception("Not rgba 8888 format");
 
             ScreenCapture sc = new ScreenCapture(w, h);
             for(int y = 0; y < h; y++) {
                 for(int x = 0; x < w; x++) {
-                    // r, g, b, a
-                    sc[x, y] = br.ReadBytes(4);
+                    // This thing took the most of the cpu
+                    sc[x, y] = new byte[] { a[i], a[i + 1], a[i + 2], a[i + 3] };
+                    i += 4;
+                    // or sc[x, y] = a[i..(i += 4)];
                 }
             }
             return sc;
