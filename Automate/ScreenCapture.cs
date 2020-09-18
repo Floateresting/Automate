@@ -132,17 +132,18 @@ namespace Automate {
                 // bytes per pixel
                 int bytespp = Image.GetPixelFormatSize(b.PixelFormat) / 8;
                 byte* ptr = (byte*)d.Scan0;
+                int width = b.Width;
                 Parallel.For(0, b.Height, y => {
                     // Index of the 1st pixel on y-coordinate for the ScreenCapture
                     int sc0 = y * this.Width;
                     // Index of the 1st pixel on y-coordinate for the Bitmap pointer
                     int bp0 = y * s;
-                    for(int x = 0; x < b.Width; x++) {
+                    for(int x = 0; x < width; x++) {
                         // index of 1st px + xcoord + rgba index
-                        ptr[bp0 + x * bytespp] = this[sc0 * x + 2]; // b
-                        ptr[bp0 + x * bytespp + 1] = this[sc0 * x + 1]; // g
-                        ptr[bp0 + x * bytespp + 2] = this[sc0 * x]; // r
-                        ptr[bp0 + x * bytespp + 3] = this[sc0 * x + 3]; // a
+                        ptr[bp0 + x * bytespp] = this[sc0 + x + 2]; // b
+                        ptr[bp0 + x * bytespp + 1] = this[sc0 + x + 1]; // g
+                        ptr[bp0 + x * bytespp + 2] = this[sc0 + x]; // r
+                        ptr[bp0 + x * bytespp + 3] = this[sc0 + x + 3]; // a
                     }
                 });
                 b.UnlockBits(d);
@@ -172,7 +173,7 @@ namespace Automate {
                     array[i + 3] = ptr[i + 3]; // a
                 }
             }
-            return new ScreenCapture(b.Width,b.Height,array);
+            return new ScreenCapture(b.Width, b.Height, array);
         }
 
         public static ScreenCapture FromBitmap(string filename) {
