@@ -15,7 +15,7 @@ namespace Automate {
             // h.Width - n.Width so the needle won't be outside of heystack ( same for GL(0) )
             for(int x1 = 0; x1 <= heystack.Width - needle.Width; x1++) {
                 for(int y1 = 0; y1 <= heystack.Height - needle.Height; y1++) {
-                    if(heystack.MatchesWith(x1, y1, needle, tolerance)) {
+                    if(heystack.MatchesWith(x1 + y1 * heystack.Width, needle, tolerance)) {
                         // return middle point
                         return new Point(x1 + needle.Width / 2, y1 + needle.Height / 2);
                     }
@@ -38,7 +38,7 @@ namespace Automate {
                     // Skip pixels that are in found areas
                     if(covered.Select(rect => rect.Contains(x1, y1)).Any()) continue;
                     // Add rect and return point if matches
-                    if(heystack.MatchesWith(x1, y1, needle, tolerance)) {
+                    if(heystack.MatchesWith(x1 + y1 * heystack.Width, needle, tolerance)) {
                         // Add needle with minimum distance
                         covered.Add(new Rectangle(
                             x1 - distance,
@@ -64,7 +64,7 @@ namespace Automate {
         public static Point LocateTemplate(this ScreenCapture heystack, Template t) {
             for(int x1 = t.X; x1 <= t.X + t.Width; x1++) {
                 for(int y1 = t.Y; y1 <= t.Y + t.Height; y1++) {
-                    if(heystack.MatchesWith(x1, y1, t.Color, t.Size, t.Size, t.Tolerance2)) {
+                    if(heystack.MatchesWith(x1 + y1 * heystack.Width, t.Color, t.Size * t.Size, t.Tolerance2)) {
                         int offset = t.Size / 2;
                         return new Point(x1 + offset, y1 + offset);
                     }
@@ -73,13 +73,13 @@ namespace Automate {
             return Point.Empty;
         }
 
-        public static IEnumerable<Point> LocateTemplateAll(this ScreenCapture h, Template t) {
+        public static IEnumerable<Point> LocateTemplateAll(this ScreenCapture heystack, Template t) {
             List<Rectangle> covered = new List<Rectangle>();
             int offset = t.Size / 2;
             for(int x1 = t.X; x1 <= t.X + t.Width; x1++) {
                 for(int y1 = t.Y; y1 <= t.Y + t.Height; y1++) {
                     if(covered.Where(rect => rect.Contains(x1, y1)).Any()) continue;
-                    if(h.MatchesWith(x1, y1, t.Color, t.Size, t.Size, t.Tolerance2)) {
+                    if(heystack.MatchesWith(x1 + y1 * heystack.Width, t.Color, t.Size * t.Size, t.Tolerance2)) {
                         covered.Add(new Rectangle(
                             x1 - t.Distance,
                             y1 - t.Distance,

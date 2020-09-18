@@ -2,20 +2,24 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Automate {
     public class ScreenCapture {
-        public byte[,][] Data { get; }
-        public int Width => this.Data.GetLength(0);
-        public int Height => this.Data.GetLength(1);
+        public byte[] ByteArray { get; }
+        public int Width { get; }
+        public int Height { get; }
 
-        public byte[] this[int x, int y] {
-            get => this.Data[x, y];
-            set => this.Data[x, y] = value;
-        }
+        public byte this[int i] => this.ByteArray[i];
+        // Implementing this[start..end]
+        public byte[] this[Range r] => this.ByteArray[r];
 
-        public ScreenCapture(int w, int h) {
-            this.Data = new byte[w, h][];
+        public int Length => this.ByteArray.Length;
+
+        public ScreenCapture(int w, int h, byte[] a) {
+            this.Width = w;
+            this.Height = h;
+            this.ByteArray = a;
         }
 
         #region Match
@@ -23,14 +27,14 @@ namespace Automate {
         /// <summary>
         /// Indicates whether the difference between two colors are tolerable
         /// </summary>
-        /// <param name="rgba">{r, g, b, a}</param>
-        /// <param name="t2">tolerance squared</param>
+        /// <param name="start">Start Index</param>
+        /// <param name="rgba">byte[]{r, g, b, a}</param>
+        /// <param name="t2">Tolerance squared</param>
         /// <returns></returns>
-        private bool MatchesWith(int x, int y, byte[] rgba, int t2) {
+        private bool MatchesWith(int start, byte[] rgba, int t2) {
             int actual = 0;
-            // Transparent pixels: not implemented
             for(int i = 0; i < 3; i++) {
-                actual += (this[x, y][i] - rgba[i]) * (this[x, y][i] - rgba[i]);
+                actual += (this[start + i] - rgba[i]) * (this[start + i] - rgba[i]);
             }
             return actual <= t2;
         }
@@ -38,18 +42,12 @@ namespace Automate {
         /// <summary>
         /// Indicates whether all the colors differences are tolerable,
         /// </summary>
-        /// <param name="x1">Start x position</param>
-        /// <param name="y1">Start y position</param>
-        /// <param name="needle">Data to compare with</param>
+        /// <param name="n">Data to compare with</param>
         /// <param name="t2">Tolerance squared</param>
         /// <returns></returns>
-        internal bool MatchesWith(int x1, int y1, ScreenCapture needle, int t2) {
-            for(int x2 = 0; x2 < needle.Width; x2++) {
-                for(int y2 = 0; y2 < needle.Height; y2++) {
-                    if(!this.MatchesWith(x1 + x2, y1 + y2, needle[x2, y2], t2)) {
-                        return false;
-                    }
-                }
+        internal bool MatchesWith(int start, ScreenCapture n, int t2) {
+            for(int i = 0; i > n.Length; i++) {
+                if(!this.MatchesWith(start + i, n[i..(i + 4)], t2)) return false;
             }
             return true;
         }
@@ -57,20 +55,15 @@ namespace Automate {
         /// <summary>
         /// Indicates whether part of the region is a solid color
         /// </summary>
-        /// <param name="x1">Start x position</param>
-        /// <param name="y1">Start y position</param>
-        /// <param name="rgba">{r, g, b, a}</param>
-        /// <param name="w">Width of the solid color region</param>
-        /// <param name="h">Height of the solid color region</param>
+        /// <param name="start">Start Index</param>
+        /// <param name="rgba">byte[]{r, g, b, a}</param>
+        /// <param name="length">Length of the target region</param>
         /// <param name="t2">Tolerance squared</param>
         /// <returns></returns>
-        internal bool MatchesWith(int x1, int y1, byte[] rgba, int w, int h, int t2) {
-            for(int x2 = 0; x2 < w; x2++) {
-                for(int y2 = 0; y2 < h; y2++) {
-                    if(!this.MatchesWith(x1 + x2, y1 + y2, rgba, t2)) {
-                        return false;
-                    }
-                }
+        internal bool MatchesWith(int start, byte[] rgba, int length, int t2) {
+            while(start < length) {
+                if(!this.MatchesWith(start, rgba, t2)) return false;
+                start++;
             }
             return true;
         }
@@ -83,11 +76,7 @@ namespace Automate {
             bw.Write(this.Width); // int
             bw.Write(this.Height); // int
             bw.Write(1); // format: int (always rgba_8888)
-            for(int y = 0; y < this.Height; y++) {
-                for(int x = 0; x < this.Width; x++) {
-                    bw.Write(this[x, y]);
-                }
-            }
+            bw.Write(this.ByteArray);
             return this;
         }
 
@@ -106,23 +95,16 @@ namespace Automate {
             using MemoryStream ms = new MemoryStream();
             s.CopyTo(ms);
             byte[] a = ms.ToArray();
+
+            // The first 12 bytes are width, height and pixel format
             int i = -4;
             int w = BitConverter.ToInt32(a, i += 4);
             int h = BitConverter.ToInt32(a, i += 4);
             int f = BitConverter.ToInt32(a, i += 4);
 
             if(f != 1) throw new Exception("Not rgba 8888 format");
-
-            ScreenCapture sc = new ScreenCapture(w, h);
-            for(int y = 0; y < h; y++) {
-                for(int x = 0; x < w; x++) {
-                    // This thing took the most of the cpu
-                    sc[x, y] = new byte[] { a[i], a[i + 1], a[i + 2], a[i + 3] };
-                    i += 4;
-                    // or sc[x, y] = a[i..(i += 4)];
-                }
-            }
-            return sc;
+            // Range operator, I love you so much
+            return new ScreenCapture(w, h, a[(i += 4)..]);
         }
 
         public static ScreenCapture FromFile(string filename) {
@@ -138,55 +120,59 @@ namespace Automate {
         /// </summary>
         /// <returns></returns>
         public Bitmap ToBitmap() {
-            Bitmap b = new Bitmap(this.Width, this.Height);
-            BitmapData d = b.LockBits(
-                new Rectangle(0, 0, this.Width, this.Height),
-                ImageLockMode.ReadWrite,
-                PixelFormat.Format32bppArgb
-            );
-            int s = d.Stride;
-
+            using Bitmap b = new Bitmap(this.Width, this.Height);
             unsafe {
+                BitmapData d = b.LockBits(
+                    new Rectangle(0, 0, b.Width, b.Height),
+                    ImageLockMode.ReadWrite,
+                    b.PixelFormat
+                );
+
+                int s = d.Stride;
+                // bytes per pixel
+                int bytespp = Image.GetPixelFormatSize(b.PixelFormat) / 8;
                 byte* ptr = (byte*)d.Scan0;
-                for(int x = 0; x < this.Width; x++) {
-                    for(int y = 0; y < this.Height; y++) {
-                        ptr[x * 4 + y * s] = this[x, y][2]; // b
-                        ptr[x * 4 + y * s + 1] = this[x, y][1]; // g
-                        ptr[x * 4 + y * s + 2] = this[x, y][0]; // r
-                        ptr[x * 4 + y * s + 3] = this[x, y][3]; // a
+                Parallel.For(0, b.Height, y => {
+                    // Index of the 1st pixel on y-coordinate for the ScreenCapture
+                    int sc0 = y * this.Width;
+                    // Index of the 1st pixel on y-coordinate for the Bitmap pointer
+                    int bp0 = y * s;
+                    for(int x = 0; x < b.Width; x++) {
+                        // index of 1st px + xcoord + rgba index
+                        ptr[bp0 + x * bytespp] = this[sc0 * x + 2]; // b
+                        ptr[bp0 + x * bytespp + 1] = this[sc0 * x + 1]; // g
+                        ptr[bp0 + x * bytespp + 2] = this[sc0 * x]; // r
+                        ptr[bp0 + x * bytespp + 3] = this[sc0 * x + 3]; // a
                     }
-                }
+                });
+                b.UnlockBits(d);
             }
-            b.UnlockBits(d);
             return b;
         }
 
         public static ScreenCapture FromBitmap(Bitmap b) {
-            ScreenCapture sc = new ScreenCapture(b.Width, b.Height);
-            // Lock bitmap into memory
-            BitmapData d = b.LockBits(
-                new Rectangle(0, 0, b.Width, b.Height),
-                ImageLockMode.ReadOnly,
-                b.PixelFormat
-            );
-            int s = d.Stride;
-            int bytesPerPixel = Bitmap.GetPixelFormatSize(b.PixelFormat) / 8;
+            // bytes per pixel
+            int bytespp = Image.GetPixelFormatSize(b.PixelFormat) / 8;
+
+            byte[] array = new byte[b.Width * b.Height * bytespp];
             unsafe {
+                // Lock bitmap into memory
+                BitmapData d = b.LockBits(
+                    new Rectangle(0, 0, b.Width, b.Height),
+                    ImageLockMode.ReadOnly,
+                    b.PixelFormat
+                );
+                int s = d.Stride;
                 byte* ptr = (byte*)d.Scan0;
-                // scan through each row
-                for(int y = 0; y < b.Height; y++) {
-                    byte* line = ptr + y * s;
-                    for(int x = 0, i = 0; x < b.Width; x++, i += bytesPerPixel) {
-                        sc[x, y] = new byte[] {
-                            line[i+2], // r
-                            line[i+1], // g
-                            line[i], // b
-                            line[i+3] // a
-                        };
-                    }
+                // scan through each pixel
+                for(int i = 0; i < b.Width * b.Height; i++) {
+                    array[i] = ptr[i + 2]; // r 
+                    array[i + 1] = ptr[i + 1]; // g
+                    array[i + 2] = ptr[i];// b
+                    array[i + 3] = ptr[i + 3]; // a
                 }
             }
-            return sc;
+            return new ScreenCapture(b.Width,b.Height,array);
         }
 
         public static ScreenCapture FromBitmap(string filename) {
