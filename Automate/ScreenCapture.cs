@@ -120,7 +120,7 @@ namespace Automate {
         /// </summary>
         /// <returns></returns>
         public Bitmap ToBitmap() {
-            using Bitmap b = new Bitmap(this.Width, this.Height);
+            Bitmap b = new Bitmap(this.Width, this.Height, PixelFormat.Format32bppArgb);
             unsafe {
                 BitmapData d = b.LockBits(
                     new Rectangle(0, 0, b.Width, b.Height),
@@ -131,21 +131,20 @@ namespace Automate {
                 int s = d.Stride;
                 // bytes per pixel
                 int bytespp = Image.GetPixelFormatSize(b.PixelFormat) / 8;
-                byte* ptr = (byte*)d.Scan0;
-                int width = b.Width;
-                Parallel.For(0, b.Height, y => {
-                    // Index of the 1st pixel on y-coordinate for the ScreenCapture
-                    int sc0 = y * this.Width;
-                    // Index of the 1st pixel on y-coordinate for the Bitmap pointer
-                    int bp0 = y * s;
-                    for(int x = 0; x < width; x++) {
-                        // index of 1st px + xcoord + rgba index
-                        ptr[bp0 + x * bytespp] = this[sc0 + x + 2]; // b
-                        ptr[bp0 + x * bytespp + 1] = this[sc0 + x + 1]; // g
-                        ptr[bp0 + x * bytespp + 2] = this[sc0 + x]; // r
-                        ptr[bp0 + x * bytespp + 3] = this[sc0 + x + 3]; // a
+                byte* bitmapPtr = (byte*)d.Scan0;
+                Parallel.For(0, d.Height, y => {
+                    // index of the array at (0, y)
+                    int i0 = y * s;
+                    // pointer of the first byte at (0, y)
+                    byte* line = bitmapPtr + i0;
+                    for(int x = 0; x < s; x += bytespp) {
+                        line[x] = this[i0 + x + 2]; // b
+                        line[x + 1] = this[i0 + x + 1]; // g
+                        line[x + 2] = this[i0 + x]; // r
+                        line[x + 3] = this[i0 + x + 3]; // a
                     }
                 });
+
                 b.UnlockBits(d);
             }
             return b;
