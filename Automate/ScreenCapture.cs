@@ -1,11 +1,16 @@
 ﻿using System;
+using System.ComponentModel.Design;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
+using System.Reflection.Metadata;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Automate {
     public class ScreenCapture {
+        public const int BytesPerPixel = 4;
         public byte[] ByteArray { get; }
         public int Width { get; }
         public int Height { get; }
@@ -23,47 +28,46 @@ namespace Automate {
         }
 
         #region Match
-
-        /// <summary>
-        /// Indicates whether the difference between two colors are tolerable
-        /// </summary>
-        /// <param name="start">Start Index</param>
-        /// <param name="rgba">byte[]{r, g, b, a}</param>
-        /// <param name="t2">Tolerance squared</param>
-        /// <returns></returns>
-        private bool MatchesWith(int start, byte[] rgba, int t2) {
-            int actual = 0;
-            for(int i = 0; i < 3; i++) {
-                actual += (this[start + i] - rgba[i]) * (this[start + i] - rgba[i]);
-            }
-            return actual <= t2;
+        private string ToHex(byte[] rgb) {
+            return (rgb[0] * 0x1000 + rgb[1] * 0x100 + rgb[2]).ToString("x");
+        }
+        private (int, int) ToCoord(int i) {
+            return (i % this.Width, i / this.Width);
         }
 
         /// <summary>
-        /// Indicates whether all the colors differences are tolerable,
+        /// Check if every pixel on a line matches
         /// </summary>
-        /// <param name="n">Data to compare with</param>
+        /// <param name="from">Start index inclusive</param>
+        /// <param name="to">End index exclusive</param>
+        /// <param name="rgb">Color in {r, g, b}</param>
         /// <param name="t2">Tolerance squared</param>
         /// <returns></returns>
-        internal bool MatchesWith(int start, ScreenCapture n, int t2) {
-            for(int i = 0; i > n.Length; i++) {
-                if(!this.MatchesWith(start + i, n[i..(i + 4)], t2)) return false;
+        private bool MatchesLine(int from, int to, byte[] rgb, int t2) {
+            int sum = 0;
+
+            for(int i = from; i < to; i++) {
+                for(int b = 0; b < 3; b++) {
+                    sum += (this[i * 4 + b] - rgb[b]) * (this[i * 4 + b] - rgb[b]);
+                }
             }
-            return true;
+            return sum / (to - from) <= t2;
         }
 
         /// <summary>
-        /// Indicates whether part of the region is a solid color
+        /// Check if every pixel in a region matches
         /// </summary>
-        /// <param name="start">Start Index</param>
-        /// <param name="rgba">byte[]{r, g, b, a}</param>
-        /// <param name="length">Length of the target region</param>
+        /// <param name="start">Start pixel index</param>
+        /// <param name="width">Width in number of pixels</param>
+        /// <param name="height">Height in number of pixels</param>
+        /// <param name="rgb">{r, g, b}</param>
         /// <param name="t2">Tolerance squared</param>
         /// <returns></returns>
-        internal bool MatchesWith(int start, byte[] rgba, int length, int t2) {
-            while(start < length) {
-                if(!this.MatchesWith(start, rgba, t2)) return false;
-                start++;
+        internal bool MatchesRectangle(int start, int width, int height, byte[] rgb, int t2) {
+            for(int y = 0; y < height; y++) {
+                int from = start + y * this.Width;
+                int to = from + width;
+                if(!this.MatchesLine(from, to, rgb, t2)) return false;
             }
             return true;
         }
