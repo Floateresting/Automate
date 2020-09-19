@@ -2,6 +2,7 @@
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Automate {
     public static class ScreenCaptureExtensions {
@@ -10,27 +11,29 @@ namespace Automate {
         /// </summary>
         /// <param name="sc"></param>
         /// <param name="t"></param>
-        /// <returns></returns>
+        /// <returns>Center point of the found match</returns>
         public static Point LocateCenter(this ScreenCapture sc, Template t) {
+            int offset = t.Size / 2;
+            Point p = Point.Empty;
             // t.Width - t.Size so the template won't be outside of sc
-            for(int x = t.X; x < t.X + t.Width - t.Size; x++) {
-                for(int y = t.Y; y < t.Y + t.Height - t.Size; y++) {
+            Parallel.For(t.X, t.X + t.Width - t.Size, (x, stateX) => {
+                Parallel.For(t.Y, t.Y + t.Height - t.Size, (y, stateY) => {
                     if(sc.MatchesRectangle(x + y * sc.Width, t.Size, t.Size, t.Color, t.Tolerance2)) {
-                        int offset = t.Size / 2;
-                        // return middle point
-                        return new Point(x + offset, y + offset);
+                        p = new Point(x + offset, y + offset);
+                        stateX.Break();
+                        stateY.Break();
                     }
-                }
-            }
-            return Point.Empty;
+                });
+            });
+            return p;
         }
 
         /// <summary>
-        /// Search for a <see cref="Template"/> and return all the matches
+        /// Search for a <see cref="Template"/> and return all matches
         /// </summary>
         /// <param name="sc"></param>
         /// <param name="t"></param>
-        /// <returns></returns>
+        /// <returns>Center points of all found matches</returns>
         public static IEnumerable<Point> LocateCenterAll(this ScreenCapture sc, Template t) {
             List<Rectangle> covered = new List<Rectangle>();
             int offset = t.Size / 2;
