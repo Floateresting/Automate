@@ -119,64 +119,61 @@ namespace Automate {
         /// Convert byte array to a <see cref="Bitmap"/> by not using <see cref="Bitmap.SetPixel(int, int, Color)"/>
         /// </summary>
         /// <returns></returns>
-        public Bitmap ToBitmap() {
+        public unsafe Bitmap ToBitmap() {
             Bitmap b = new Bitmap(this.Width, this.Height, PixelFormat.Format32bppArgb);
-            unsafe {
-                BitmapData d = b.LockBits(
-                    new Rectangle(0, 0, b.Width, b.Height),
-                    ImageLockMode.ReadWrite,
-                    b.PixelFormat
-                );
+            BitmapData d = b.LockBits(
+                new Rectangle(0, 0, b.Width, b.Height),
+                ImageLockMode.ReadWrite,
+                b.PixelFormat
+            );
 
-                int s = d.Stride;
-                // bytes per pixel
-                int bytespp = Image.GetPixelFormatSize(b.PixelFormat) / 8;
-                byte* bitmapPtr = (byte*)d.Scan0;
-                Parallel.For(0, d.Height, y => {
-                    // index of the array at (0, y)
-                    int i0 = y * s;
-                    // pointer of the first byte at (0, y)
-                    byte* line = bitmapPtr + i0;
-                    for(int x = 0; x < s; x += bytespp) {
-                        line[x] = this[i0 + x + 2]; // b
-                        line[x + 1] = this[i0 + x + 1]; // g
-                        line[x + 2] = this[i0 + x]; // r
-                        line[x + 3] = this[i0 + x + 3]; // a
-                    }
-                });
+            int s = d.Stride;
+            // bytes per pixel
+            int bytespp = Image.GetPixelFormatSize(b.PixelFormat) / 8;
+            byte* bitmapPtr = (byte*)d.Scan0;
+            Parallel.For(0, d.Height, y => {
+                // index of the array at (0, y)
+                int i0 = y * s;
+                // pointer of the first byte at (0, y)
+                byte* line = bitmapPtr + i0;
+                for(int x = 0; x < s; x += bytespp) {
+                    line[x] = this[i0 + x + 2]; // b
+                    line[x + 1] = this[i0 + x + 1]; // g
+                    line[x + 2] = this[i0 + x]; // r
+                    line[x + 3] = this[i0 + x + 3]; // a
+                }
+            });
 
-                b.UnlockBits(d);
-            }
+            b.UnlockBits(d);
             return b;
         }
 
-        public static ScreenCapture FromBitmap(Bitmap b) {
+        public static unsafe ScreenCapture FromBitmap(Bitmap b) {
             // bytes per pixel
             int bytespp = Image.GetPixelFormatSize(b.PixelFormat) / 8;
 
             byte[] array = new byte[b.Width * b.Height * bytespp];
-            unsafe {
-                // Lock bitmap into memory
-                BitmapData d = b.LockBits(
-                    new Rectangle(0, 0, b.Width, b.Height),
-                    ImageLockMode.ReadOnly,
-                    b.PixelFormat
-                );
-                int s = d.Stride;
-                byte* ptr = (byte*)d.Scan0;
-                // scan through each pixel
-                for(int i = 0; i < b.Width * b.Height; i++) {
-                    array[i] = ptr[i + 2]; // r 
-                    array[i + 1] = ptr[i + 1]; // g
-                    array[i + 2] = ptr[i];// b
-                    array[i + 3] = ptr[i + 3]; // a
-                }
-            }
+            // Lock bitmap into memory
+            BitmapData d = b.LockBits(
+                new Rectangle(0, 0, b.Width, b.Height),
+                ImageLockMode.ReadOnly,
+                b.PixelFormat
+            );
+            int s = d.Stride;
+            byte* ptr = (byte*)d.Scan0;
+            // Scan though each pixel
+            Parallel.For(0, d.Width * d.Height, i => {
+                i *= bytespp;
+                array[i] = ptr[i + 2]; // r
+                array[i + 1] = ptr[i + 1];// g
+                array[i + 2] = ptr[i]; // b
+                array[i + 3] = ptr[i + 3];// a
+            });
             return new ScreenCapture(b.Width, b.Height, array);
         }
 
         public static ScreenCapture FromBitmap(string filename) {
-            using Bitmap b = new Bitmap(filename);
+            Bitmap b = new Bitmap(filename);
             return ScreenCapture.FromBitmap(b);
         }
         #endregion Bitmap
